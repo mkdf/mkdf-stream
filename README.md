@@ -1,5 +1,4 @@
-## MKDF-STREAM
+# MK Data Factory / Stream
 
-#### MK Data Factory streaming data plugin
 
 
