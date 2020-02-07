@@ -1,0 +1,15 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Stream details</h2>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+
+            Stream details here<br />
+            UUID: <?= $dataset->uuid ?>
+        </div>
+    </div>
+</div>
