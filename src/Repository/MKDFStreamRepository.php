@@ -1,0 +1,127 @@
+<?php
+
+
+namespace MKDF\Stream\Repository;
+
+
+class MKDFStreamRepository implements MKDFStreamRepositoryInterface
+{
+    private $_config;
+
+
+    public function __construct($config)
+    {
+        $this->_config = $config;
+    }
+
+    public function getApiHref($uuid) {
+        return ($this->_config['mkdf-stream']['public-url'] . '/data/query/' . $uuid);
+    }
+
+    public function getCollectionList () {
+        return $this->sendQuery('GET','/api-factory/datasets', []);
+    }
+
+    public function createDataset($uuid, $api_key){
+        //$this->sendQuery("PUT", '/api-factory/datasets', array('uuid'=>$uuid,'key'=>$api_key));
+        echo "ACTIVATING dataset ".$uuid." with key ".$api_key;
+        return true;
+    }
+
+    public function getDocCount($uuid){
+        $repsonse = $this->sendQuery('GET','/api-factory/datasets', array('uuid'=>$uuid));
+        $arr = json_decode($repsonse,true);
+        return $arr;
+    }
+
+    public function getStreamExists($uuid) {
+        $repsonse = $this->sendQuery('GET','/api-factory/datasets', array('uuid'=>$uuid));
+        $arr = json_decode($repsonse,true);
+        if (empty($arr)){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    public function removePermission($uuid, $key){
+        $this->sendQuery($uuid, $key, "d");
+    }
+
+    private function setPermission($uuid, $key, $permission){
+        switch ($permission) {
+            case "a":
+                $read = 1;
+                $write = 1;
+                break;
+            case "w":
+                $read = 0;
+                $write = 1;
+                break;
+            case "r":
+                $read = 1;
+                $write = 0;
+                break;
+            case "d":
+                $read = 0;
+                $write = 0;
+                break;
+            default:
+                $read = 0;
+                $write = 0;
+        }
+        $this->sendQuery("POST",'/api-factory/permissions', array('uuid'=>$uuid,'key'=>$key, 'read'=>$read, 'write'=>$write));
+    }
+
+    private function sendQuery($method, $path, $parameters) {
+        $username = $this->_config['mkdf-stream']['user'];
+        $password = $this->_config['mkdf-stream']['pass'];
+        $server = $this->_config['mkdf-stream']['server-url'];
+        $parameters = array_merge(array('user' => $username,'pwd'=>$password), $parameters);
+        $url = $server . $path;
+        $ch = curl_init();
+
+        switch ($method){
+            case "PUT":
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+                break;
+            case "POST":
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+                break;
+            case "GET":
+                curl_setopt($ch, CURLOPT_HTTPGET, 1);
+                $url = $url . '?' . http_build_query($parameters);
+                curl_setopt($ch, CURLOPT_URL, $url);
+            default:
+                //unexpected method
+        }
+        // receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $server_output = curl_exec ($ch);
+
+        if (!curl_errno($ch)) {
+            switch ($http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE)) {
+                case 201:  # OK Created
+                    //self::log('Message from API Factory server: ',$server_output);
+                    //echo "201";
+                    break;
+                case 200:  # OK Updated
+                    //self::log('Message from API Factory server: ',$server_output);
+                    //echo "200";
+                    break;
+                default:
+                    //self::logErr('Unexpected HTTP code:', $http_code, $server_output);
+                    //echo "Something else: ".$http_code;
+            }
+        }else{
+            //self::logErr('Curl Error: ', $curl_errno($ch));
+            echo 'Curl error: ' . curl_error($ch);
+        }
+        curl_close ($ch);
+        return $server_output;
+    }
+}

@@ -2,7 +2,6 @@
 
 namespace MKDF\Stream;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 
@@ -14,11 +13,11 @@ return [
     ],
     'service_manager' => [
         'aliases' => [
-            //Repository\MKDFKeysRepositoryInterface::class => Repository\MKDFKeysRepository::class
+            Repository\MKDFStreamRepositoryInterface::class => Repository\MKDFStreamRepository::class
         ],
         'factories' => [
-            //Repository\MKDFKeysRepository::class => Repository\Factory\MKDFKeysRepositoryFactory::class,
-            Feature\StreamFeature::class => InvokableFactory::class
+            Repository\MKDFStreamRepository::class => Repository\Factory\MKDFStreamRepositoryFactory::class,
+            Feature\StreamFeature::class => Feature\Factory\StreamFeatureFactory::class
         ]
     ],
     'router' => [
@@ -55,7 +54,7 @@ return [
     ],
     'view_manager' => [
         'template_path_stack' => [
-            'keys' => __DIR__ . '/../view',
+            'Stream' => __DIR__ . '/../view',
         ],
     ],
     'controller_plugins' => [
