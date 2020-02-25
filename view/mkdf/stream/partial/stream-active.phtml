@@ -1,0 +1,27 @@
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Stream active</h5>
+        <h6 class="card-subtitle mb-2 text-muted">This Stream API is active and ready for read/write operations</h6>
+        <p class="card-text">
+
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>UUID:</th>
+                <td><?= $this->escapeHtml($dataset->uuid) ?></th>
+            </tr>
+            <tr>
+                <th>READ:</th>
+                <td><?= $this->escapeHtml($stream_url) ?></th>
+            </tr>
+            <tr>
+                <th>Total docs:</th>
+                <td><?= $this->escapeHtml($doc_count) ?></td>
+            </tr>
+        </table>
+
+        </p>
+
+    </div>
+</div>
+
+

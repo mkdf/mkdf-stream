@@ -23,8 +23,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
     }
 
     public function createDataset($uuid, $api_key){
-        //$this->sendQuery("PUT", '/api-factory/datasets', array('uuid'=>$uuid,'key'=>$api_key));
-        echo "ACTIVATING dataset ".$uuid." with key ".$api_key;
+        $this->sendQuery("PUT", '/api-factory/datasets', array('uuid'=>$uuid,'key'=>$api_key));
         return true;
     }
 
@@ -84,7 +83,9 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
 
         switch ($method){
             case "PUT":
+                curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
                 break;
             case "POST":
                 curl_setopt($ch, CURLOPT_URL, $url);

@@ -37,49 +37,65 @@ class StreamController extends AbstractActionController
         $message = "Dataset: " . $id;
         $actions = [];
         $can_edit = ($dataset->user_id == $user_id);
-        $streamExists = false;
-        $streamSummary = $this->_repository->getStreamExists($id);
+        $streamExists = $this->_repository->getStreamExists($dataset->uuid);
         $keys = [];
+        $userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
         if ($can_edit) {
-            $keys = $this->_keys_repository->findAllUserKeys($user_id);
-            $activationParams = ['id' => $id, 'action' => 'activate'];
-            $activationLink = $this->url( 'stream', $activationParams, [] );
-            //print_r($activationLink);
+            $docCount = 0;
+            $keys = [];
+            $activationLink = null;
+            if ($streamExists) {
+                $docCount = $this->_repository->getDocCount($dataset->uuid)['totalDocs'];
+            }
+            else {
+                $keys = $this->_keys_repository->findAllUserKeys($user_id);
+                $activationParams = ['id' => $id, 'action' => 'activate'];
+                $activationLink = $this->url( 'stream', $activationParams, [] );
+            }
             $actions = [
                 'label' => 'Actions',
                 'class' => '',
                 'buttons' => [
                 ]
             ];
-
             return new ViewModel([
                 'message' => $message,
                 'stream_exists' => $streamExists,
+                'doc_count' => $docCount,
                 'keys' => $keys,
                 'activate_url' => $activationLink,
                 'dataset' => $dataset,
                 'stream_url' => $this->_repository->getApiHref($dataset->uuid),
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'actions' => $actions
+                'actions' => $actions,
+                'can_edit' => $can_edit,
+                'user_has_key' => $userHasKey,
             ]);
+        }
+        else{
+            // FIXME Better handling security
+            throw new \Exception('Unauthorized');
         }
 
     }
 
     public function activateAction() {
         if($this->getRequest()->isPost()) {
+            $user_id = $this->currentUser()->getId();
             $data = $this->getRequest()->getPost();
             //print_r($data);
             $id = (int) $this->params()->fromRoute('id', 0);
             $dataset = $this->_dataset_repository->findDataset($id);
-            $apiKey = $data['api-key'];
-            if($dataset == null){
-                throw new \Exception('Not found');
+            $keyUuid = $data['api-key'];
+            $key = $this->_keys_repository->findKeyFromUuid($keyUuid,$user_id);
+            if(($dataset == null) || ($key == null)){
+                throw new \Exception('Key/Dataset not found');
             }
-            $user_id = $this->currentUser()->getId();
+
             $can_edit = ($dataset->user_id == $user_id);
-            if($can_edit && $apiKey){
-                $outcome = $this->_repository->createDataset($dataset->uuid, $apiKey);
+            if($can_edit && $keyUuid){
+                $this->_repository->createDataset($dataset->uuid, $keyUuid);
+                $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
                 $this->flashMessenger()->addSuccessMessage('The Stream API was activated successfully.');
                 return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
             }else{

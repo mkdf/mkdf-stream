@@ -7,29 +7,16 @@
         <div class="col-md-9">
             <h2>Stream details</h2>
             <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
-            Stream details here<br />
+            <!--
             UUID: <?= $dataset->uuid ?><br />
-            API: <?= $stream_url ?> <br />
+            -->
 
             <?php if($stream_exists): ?>
-                API: <?= $stream_url ?> <br />
+                <?= $this->partial('mkdf/stream/partial/stream-active', ['stream_url' => $stream_url, 'doc_count' => $doc_count, 'dataset' => $dataset] ) ?>
             <?php endif; ?>
 
             <?php if(!$stream_exists): ?>
-                This Stream API has not yet been activated. In order to use it, please select a key from the list below to
-                associate with the API. This key will have both read and write permissions. If you wish to first create a
-                new key, please visit your keys page.<br/>
-                <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'activate'],[]); ?>" method="post" id="activate-form" name="activate-form">
-                <div class="form-group">
-                    <label for="api-key">Select key:</label>
-                    <select class="form-control" id="api-key" name="api-key">
-                        <?php foreach ($keys as $key): ?>
-                            <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Activate</button>
-                </div>
-                </form>
+                <?= $this->partial('mkdf/stream/partial/stream-inactive', ['dataset' => $dataset, 'keys' => $keys, 'can_edit' => $can_edit] ) ?>
             <?php endif; ?>
         </div>
     </div>
