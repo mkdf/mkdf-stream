@@ -3,6 +3,7 @@ namespace MKDF\Stream\Controller\Factory;
 
 use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
 use MKDF\Core\Repository\MKDFCoreRepositoryInterface;
+use MKDF\Datasets\Service\DatasetPermissionManagerInterface;
 use MKDF\Keys\Repository\MKDFKeysRepositoryInterface;
 use MKDF\Stream\Controller\StreamController;
 use MKDF\Stream\Repository\Factory\MKDFStreamRepositoryFactory;
@@ -21,6 +22,7 @@ class StreamControllerFactory implements FactoryInterface
         $dataset_repository = $container->get(MKDFDatasetRepositoryInterface::class);
         $keys_repository = $container->get(MKDFKeysRepositoryInterface::class);
         $sessionManager = $container->get(SessionManager::class);
-        return new StreamController($keys_repository, $dataset_repository, $repository, $config);
+        $permissionManager = $container->get(DatasetPermissionManagerInterface::class);
+        return new StreamController($keys_repository, $dataset_repository, $repository, $config, $permissionManager);
     }
 }

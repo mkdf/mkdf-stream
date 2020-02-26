@@ -3,6 +3,7 @@ namespace MKDF\Stream\Controller;
 
 use MKDF\Core\Repository\MKDFCoreRepositoryInterface;
 use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
+use MKDF\Datasets\Service\DatasetPermissionManager;
 use MKDF\Keys\Repository\MKDFKeysRepositoryInterface;
 use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -18,13 +19,15 @@ class StreamController extends AbstractActionController
     private $_repository;
     private $_dataset_repository;
     private $_keys_repository;
+    private $_permissionManager;
 
-    public function __construct(MKDFKeysRepositoryInterface $keysRepository, MKDFDatasetRepositoryInterface $datasetRepository, MKDFStreamRepositoryInterface $repository, array $config)
+    public function __construct(MKDFKeysRepositoryInterface $keysRepository, MKDFDatasetRepositoryInterface $datasetRepository, MKDFStreamRepositoryInterface $repository, array $config, DatasetPermissionManager $permissionManager)
     {
         $this->_config = $config;
         $this->_repository = $repository;
         $this->_dataset_repository = $datasetRepository;
         $this->_keys_repository = $keysRepository;
+        $this->_permissionManager = $permissionManager;
     }
 
     public function detailsAction() {
@@ -36,11 +39,13 @@ class StreamController extends AbstractActionController
         //$permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
         $actions = [];
-        $can_edit = ($dataset->user_id == $user_id);
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
+        $can_read = $this->_permissionManager->canRead($dataset,$user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $streamExists = $this->_repository->getStreamExists($dataset->uuid);
         $keys = [];
         $userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
-        if ($can_edit) {
+        if ($can_view) {
             $docCount = 0;
             $keys = [];
             $activationLink = null;
@@ -69,12 +74,13 @@ class StreamController extends AbstractActionController
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
                 'actions' => $actions,
                 'can_edit' => $can_edit,
+                'can_read' => $can_read,
                 'user_has_key' => $userHasKey,
             ]);
         }
         else{
-            // FIXME Better handling security
-            throw new \Exception('Unauthorized');
+            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
     }
@@ -88,11 +94,15 @@ class StreamController extends AbstractActionController
             $dataset = $this->_dataset_repository->findDataset($id);
             $keyUuid = $data['api-key'];
             $key = $this->_keys_repository->findKeyFromUuid($keyUuid,$user_id);
+
+            $can_view = $this->_permissionManager->canView($dataset,$user_id);
+            $can_read = $this->_permissionManager->canRead($dataset,$user_id);
+            $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+
             if(($dataset == null) || ($key == null)){
                 throw new \Exception('Key/Dataset not found');
             }
 
-            $can_edit = ($dataset->user_id == $user_id);
             if($can_edit && $keyUuid){
                 $this->_repository->createDataset($dataset->uuid, $keyUuid);
                 $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
