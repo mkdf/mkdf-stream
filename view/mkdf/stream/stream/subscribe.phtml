@@ -1,0 +1,44 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Subscribe</h2>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Choose a key</h5>
+
+                        <p class="card-text">Please select a key from the list below to
+                            subscribe to this Stream API. This key will be used to access the Stream API and will have read permissions.
+                            If you wish to first create a
+                            new key, please visit your keys page.</p>
+
+                        <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'subscribe'],[]); ?>" method="post" id="subscribe-form" name="subscribe-form">
+                            <div class="form-group">
+                                <label for="api-key">Select key:</label>
+                                <select class="form-control" id="api-key" name="api-key">
+                                    <?php foreach ($keys as $key): ?>
+                                        <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <br />
+                                <button type="submit" class="btn btn-primary">Subscribe</button>
+                            </div>
+                        </form>
+
+
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+

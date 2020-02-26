@@ -48,6 +48,10 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $this->sendQuery($uuid, $key, "d");
     }
 
+    public function addReadPermission($uuid,$key) {
+        $this->setPermission($uuid,$key,"r");
+    }
+
     private function setPermission($uuid, $key, $permission){
         switch ($permission) {
             case "a":

@@ -33,7 +33,6 @@ class StreamController extends AbstractActionController
     public function detailsAction() {
         $user_id = $this->currentUser()->getId();
         $id = (int) $this->params()->fromRoute('id', 0);
-        //FIXME - only retrieve details that the user can see according to permissions
         //FIXME - Also make sure this is a stream dataset that we are retrieving.
         $dataset = $this->_dataset_repository->findDataset($id);
         //$permissions = $this->_repository->findDatasetPermissions($id);
@@ -44,7 +43,8 @@ class StreamController extends AbstractActionController
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
         $streamExists = $this->_repository->getStreamExists($dataset->uuid);
         $keys = [];
-        $userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
+        //$userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
+        $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id,$dataset->id);
         if ($can_view) {
             $docCount = 0;
             $keys = [];
@@ -115,6 +115,60 @@ class StreamController extends AbstractActionController
         }
         else {
             throw new \Exception('Invalid form credentials supplied');
+        }
+    }
+
+    public function subscribeAction() {
+        $user_id = $this->currentUser()->getId();
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_dataset_repository->findDataset($id);
+
+        $can_view = $this->_permissionManager->canView($dataset,$user_id);
+        $can_read = $this->_permissionManager->canRead($dataset,$user_id);
+        $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+
+        if ($can_view && $can_read){
+            $keys = [];
+            if($this->getRequest()->isPost()) {
+                //Process form data and action the subscription
+                $data = $this->getRequest()->getPost();
+                $keyUuid = $data['api-key'];
+                $key = $this->_keys_repository->findKeyFromUuid($keyUuid,$user_id);
+                if(($dataset == null) || ($key == null)){
+                    throw new \Exception('Key/Dataset not found');
+                }
+
+                $this->_repository->addReadPermission($dataset->uuid, $keyUuid);
+                $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'r');
+                $this->flashMessenger()->addSuccessMessage('Subscribed to Stream API');
+                return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
+            }
+            else {
+                //
+                $keys = $this->_keys_repository->findAllUserKeys($user_id);
+                $message = "";
+                $actions = [
+                    'label' => 'Actions',
+                    'class' => '',
+                    'buttons' => [
+                    ]
+                ];
+                $activationParams = ['id' => $id, 'action' => 'subscribe'];
+                $activationLink = $this->url( 'stream', $activationParams, [] );
+                return new ViewModel([
+                    'message' => $message,
+                    'keys' => $keys,
+                    'dataset' => $dataset,
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'actions' => $actions,
+                    'activate_url' => $activationLink,
+                ]);
+
+            }
+        }
+        else {
+            $this->flashMessenger()->addErrorMessage('Unauthorised to subscribe to dataset.');
+            return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
 
