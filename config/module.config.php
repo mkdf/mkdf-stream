@@ -25,7 +25,7 @@ return [
             'stream' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/stream[/:action[/:id]]',
+                    'route' => '/dataset/stream/:action/:id',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[a-zA-Z0-9_-]*',
@@ -88,11 +88,11 @@ return [
         ]
     ],
     'navigation' => [
-        'default' => [
-            //[
-            //    'label' => 'Keys',
-            //    'route' => 'key',
-            //],
-        ],
+        //'default' => [
+        //    [
+                //'label' => 'Stream',
+                //'route' => 'dataset',
+        //    ],
+        //],
     ],
 ];

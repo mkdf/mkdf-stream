@@ -30,10 +30,10 @@ class StreamFeature implements DatasetsFeatureInterface
         return 'index';
     }
     public function getViewHref($id){
-        return '/stream/details/'.$id;
+        return '/dataset/stream/details/'.$id;
     }
     public function getEditHref($id){
-        return '/stream/details/'.$id;
+        return '/dataset/stream/details/'.$id;
     }
     public function hasFeature($id){
         // Make a DB call for this dataset to see if it's a stream dataset
