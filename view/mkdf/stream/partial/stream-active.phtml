@@ -21,13 +21,8 @@
 
         <?php
 
-            if ($can_read) {
-                if (!$user_has_key){
-                    print('<a href="'.$this->url( 'stream', ['id' => $dataset->id, 'action' => 'subscribe'], [] ).'">Subscribe to this stream</a>');
-                }
-                else{
-                    print('You are subscribed to this Stream API. ');
-                }
+            if ($can_read && $user_has_key) {
+                print('You are subscribed to this Stream API. ');
             }
 
         ?>
