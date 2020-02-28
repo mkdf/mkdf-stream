@@ -24,7 +24,7 @@ class StreamFeature implements DatasetsFeatureInterface
         return \MKDF\Stream\Controller\StreamController::class;
     }
     public function getViewAction(){
-        return 'index';
+        return 'details';
     }
     public function getEditAction(){
         return 'index';
