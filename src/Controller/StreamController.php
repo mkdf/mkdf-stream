@@ -70,7 +70,7 @@ class StreamController extends AbstractActionController
                 'keys' => $keys,
                 'activate_url' => $activationLink,
                 'dataset' => $dataset,
-                'stream_url' => $this->_repository->getApiHref($dataset->uuid),
+                'stream_url' => $this->_repository->getApiReadHref($dataset->uuid),
                 'features' => $this->datasetsFeatureManager()->getFeatures($id),
                 'actions' => $actions,
                 'can_edit' => $can_edit,

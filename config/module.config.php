@@ -78,7 +78,7 @@ return [
             'mode' => 'restrictive'
         ],
         'controllers' => [
-            Controller\KeyController::class => [
+            Controller\StreamController::class => [
                 // Allow anyone to visit "index" and "about" actions
                 //['actions' => ['index'], 'allow' => '@'],
                 ['actions' => ['details'], 'allow' => '*'],
