@@ -17,9 +17,7 @@ class Module
     {
         $config = [];
         $moduleConfig = include __DIR__ . '/../config/module.config.php';
-        $moduleConfigLocal = include __DIR__ . '/../config/module.config.local.php';
-        $config = array_merge($moduleConfig, $moduleConfigLocal);
-        return $config;
+        return $moduleConfig;
     }
 
     /**

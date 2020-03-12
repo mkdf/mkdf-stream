@@ -1,12 +1,1 @@
-<?php
-
-namespace MKDF\Stream;
-
-return [
-    'mkdf-stream' => [
-        'user'      => 'username',
-        'pass'      => 'password',
-        'server-url'    => 'http://server-url',
-        'public-url'    => 'http://public-url',
-    ],
-];
+//SEE MODULE README FOR CONFIG DETAILS
