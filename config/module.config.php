@@ -35,20 +35,6 @@ return [
                         'action' => 'details'
                     ],
                 ],
-                // 'may_terminate' => true,
-                // 'child_routes' => [
- //                                        //
- //                    // // Segment route for viewing one dataset
- //                    // 'details' => [
- //                    //     'type' => Segment::class,
- //                    //     'options' => [
- //                    //         'route' => '/[:id]',
- //                    //         'defaults' => [
- //                    //             'action' => 'details',
- //                    //         ],
- //                    //     ],
- //                    // ]
- //                ],
             ],
         ],
     ],

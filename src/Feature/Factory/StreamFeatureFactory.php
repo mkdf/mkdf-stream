@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MKDF\Stream\Feature\Factory;
-
 
 use Interop\Container\ContainerInterface;
 use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
