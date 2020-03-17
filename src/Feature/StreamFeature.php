@@ -46,7 +46,7 @@ class StreamFeature implements DatasetsFeatureInterface
         }
     }
     public function getLabel(){
-        return 'Stream API';
+        return '<i class="fas fa-satellite-dish"></i> Stream API';
     }
     public function isActive(){
         return $this->active;
