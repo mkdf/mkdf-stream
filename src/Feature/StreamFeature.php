@@ -38,7 +38,7 @@ class StreamFeature implements DatasetsFeatureInterface
     public function hasFeature($id){
         // Make a DB call for this dataset to see if it's a stream dataset
         $dataset = $this->_dataset_repository->findDataset($id);
-        if ($dataset->type == 'Stream') {
+        if (strtolower($dataset->type) == 'stream') {
             return true;
         }
         else {
