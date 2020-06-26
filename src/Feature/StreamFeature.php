@@ -32,9 +32,11 @@ class StreamFeature implements DatasetsFeatureInterface
     public function getViewHref($id){
         return '/dataset/stream/details/'.$id;
     }
+
     public function getEditHref($id){
         return '/dataset/stream/details/'.$id;
     }
+
     public function hasFeature($id){
         // Make a DB call for this dataset to see if it's a stream dataset
         $dataset = $this->_dataset_repository->findDataset($id);
@@ -45,12 +47,15 @@ class StreamFeature implements DatasetsFeatureInterface
             return false;
         }
     }
+
     public function getLabel(){
         return '<i class="fas fa-satellite-dish"></i> Stream API';
     }
+
     public function isActive(){
         return $this->active;
     }
+
     public function setActive($bool){
         $this->active = !!$bool;
     }
