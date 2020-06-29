@@ -29,6 +29,7 @@ class StreamFeature implements DatasetsFeatureInterface
     public function getEditAction(){
         return 'index';
     }
+
     public function getViewHref($id){
         return '/dataset/stream/details/'.$id;
     }
