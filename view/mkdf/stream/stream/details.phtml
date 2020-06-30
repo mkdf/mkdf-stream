@@ -7,7 +7,7 @@
         <div class="col-md-9">
             <h2>Stream details</h2>
             <?php
-            if ($can_read && !$user_has_key){
+            if ($can_read && !$user_has_key && $stream_exists){
                 //Add subscribe button
                 $actions['buttons'][] = [
                     'type' => 'primary',

@@ -9,10 +9,12 @@
                 <th>UUID:</th>
                 <td><?= $this->escapeHtml($dataset->uuid) ?></th>
             </tr>
+            <?php if ($can_read && $user_has_key): ?>
             <tr>
                 <th>READ:</th>
                 <td><?= $this->escapeHtml($stream_url) ?></th>
             </tr>
+            <?php endif; ?>
             <tr>
                 <th>Total docs:</th>
                 <td><?= $this->escapeHtml($doc_count) ?></td>
