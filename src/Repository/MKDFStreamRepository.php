@@ -15,31 +15,31 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
     }
 
     public function getApiReadHref($uuid) {
-        return ($this->_config['mkdf-stream']['public-url'] . '/data/query/' . $uuid);
+        return ($this->_config['mkdf-stream']['public-url'] . '/query/' . $uuid);
     }
 
     public function getApiWriteHref($uuid) {
-        return ($this->_config['mkdf-stream']['public-url'] . '/data/object/' . $uuid);
+        return ($this->_config['mkdf-stream']['public-url'] . '/object/' . $uuid);
     }
 
     public function getCollectionList () {
-        return $this->sendQuery('GET','/api-factory/datasets', []);
+        return $this->sendQuery('GET','/management/datasets', []);
     }
 
     public function createDataset($uuid, $api_key){
-        $this->sendQuery("PUT", '/api-factory/datasets', array('uuid'=>$uuid,'key'=>$api_key));
+        $this->sendQuery("PUT", '/management/datasets', array('uuid'=>$uuid,'key'=>$api_key));
         return true;
     }
 
     public function getDocCount($uuid){
-        $repsonse = $this->sendQuery('GET','/api-factory/datasets', array('uuid'=>$uuid));
+        $repsonse = $this->sendQuery('GET','/management/datasets', array('uuid'=>$uuid));
         //echo ($repsonse);
         $arr = json_decode($repsonse,true);
         return $arr;
     }
 
     public function getStreamExists($uuid) {
-        $repsonse = $this->sendQuery('GET','/api-factory/datasets', array('uuid'=>$uuid));
+        $repsonse = $this->sendQuery('GET','/management/datasets', array('uuid'=>$uuid));
         //echo ($repsonse);
         $arr = json_decode($repsonse,true);
         if (empty($arr)){
@@ -80,7 +80,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 $read = 0;
                 $write = 0;
         }
-        $this->sendQuery("POST",'/api-factory/permissions', array('uuid'=>$uuid,'key'=>$key, 'read'=>$read, 'write'=>$write));
+        $this->sendQuery("POST",'/management/permissions', array('uuid'=>$uuid,'key'=>$key, 'read'=>$read, 'write'=>$write));
     }
 
     private function sendQuery($method, $path, $parameters) {
