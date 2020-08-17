@@ -125,12 +125,12 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                     //echo "200";
                     break;
                 default:
-                    //self::logErr('Unexpected HTTP code:', $http_code, $server_output);
+                    throw new \Exception('Unexpected HTTP code: '. $http_code ."\n\nURL: ". $url . "\n\n" . $server_output);
                     //echo "Something else: ".$http_code;
             }
         }else{
             //self::logErr('Curl Error: ', $curl_errno($ch));
-            echo 'Curl error: ' . curl_error($ch);
+            throw new \Exception('cURL error: '. curl_error($ch) ."\n\nURL: ". $url . "\n\n" . $server_output);
         }
         curl_close ($ch);
         return $server_output;
