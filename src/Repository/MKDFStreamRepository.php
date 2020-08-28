@@ -32,14 +32,14 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
     }
 
     public function getDocCount($uuid){
-        $repsonse = $this->sendQuery('GET','/management/datasets', array('uuid'=>$uuid));
+        $repsonse = $this->sendQuery('GET','/management/datasets/' . $uuid, array());
         //echo ($repsonse);
         $arr = json_decode($repsonse,true);
         return $arr;
     }
 
     public function getStreamExists($uuid) {
-        $repsonse = $this->sendQuery('GET','/management/datasets', array('uuid'=>$uuid));
+        $repsonse = $this->sendQuery('GET','/management/datasets/' . $uuid, array());
         //echo ($repsonse);
         $arr = json_decode($repsonse,true);
         if (empty($arr)){
