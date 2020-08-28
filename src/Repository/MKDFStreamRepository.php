@@ -27,7 +27,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
     }
 
     public function createDataset($uuid, $api_key){
-        $this->sendQuery("PUT", '/management/datasets', array('uuid'=>$uuid,'key'=>$api_key));
+        $this->sendQuery("POST", '/management/datasets', array('uuid'=>$uuid,'key'=>$api_key));
         return true;
     }
 
