@@ -4,6 +4,8 @@
 namespace MKDF\Stream\Repository;
 
 
+use PHPUnit\Util\Exception;
+
 class MKDFStreamRepository implements MKDFStreamRepositoryInterface
 {
     private $_config;
@@ -83,6 +85,13 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $this->sendQuery("POST",'/management/permissions', array('uuid'=>$uuid,'key'=>$key, 'read'=>$read, 'write'=>$write));
     }
 
+    /**
+     * @param $method
+     * @param $path
+     * @param $parameters
+     * @return bool|string
+     * @throws \Exception
+     */
     private function sendQuery($method, $path, $parameters) {
         $username = $this->_config['mkdf-stream']['user'];
         $password = $this->_config['mkdf-stream']['pass'];
@@ -108,6 +117,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 curl_setopt($ch, CURLOPT_URL, $url);
             default:
                 //unexpected method
+                throw new \Exception("Unexpected method");
         }
         // receive server response ...
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
