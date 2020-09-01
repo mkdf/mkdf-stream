@@ -115,6 +115,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 curl_setopt($ch, CURLOPT_HTTPGET, 1);
                 $url = $url . '?' . http_build_query($parameters);
                 curl_setopt($ch, CURLOPT_URL, $url);
+                break;
             default:
                 //unexpected method
                 throw new \Exception("Unexpected method");
