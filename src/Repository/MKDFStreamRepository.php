@@ -53,7 +53,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
     }
 
     public function removePermission($uuid, $key){
-        $this->sendQuery($uuid, $key, "d");
+        $this->setPermission($uuid, $key, "d");
     }
 
     public function addReadPermission($uuid,$key) {
@@ -82,7 +82,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 $read = 0;
                 $write = 0;
         }
-        $this->sendQuery("POST",'/management/permissions', array('dataset-uuid'=>$uuid,'key'=>$key, 'read'=>$read, 'write'=>$write));
+        $this->sendQuery("POST",'/management/permissions/'.$key, array('dataset-uuid'=>$uuid, 'read'=>$read, 'write'=>$write));
     }
 
     /**
