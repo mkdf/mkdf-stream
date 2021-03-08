@@ -83,7 +83,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 $write = 0;
         }
         $path = '/management/permissions/'.$key;
-        $this->sendQuery("POST",$path, array('dataset-uuid'=>$uuid, 'read'=>$read, 'write'=>$write));
+        $this->sendQuery("POST",$path, array('dataset-id'=>$uuid, 'read'=>$read, 'write'=>$write));
     }
 
     /**
