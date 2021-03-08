@@ -62,9 +62,9 @@ class StreamFeature implements DatasetsFeatureInterface
     }
 
     public function initialiseDataset($id) {
-        $dataset = $this->_dataset_repository->findDataset($id);
-        $uuid = $dataset->uuid;
-        $this->_repository->createDataset($id, null);
+        //$dataset = $this->_dataset_repository->findDataset($id);
+        //$uuid = $dataset->uuid;
+        //$this->_repository->createDataset($id, null);
         //echo ("initialising stream stuff");
     }
 
