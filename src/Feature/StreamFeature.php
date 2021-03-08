@@ -62,6 +62,10 @@ class StreamFeature implements DatasetsFeatureInterface
     }
 
     public function initialiseDataset($id) {
+        /*
+         *  No need for the backend dataset to be created at this stage, it gets activated when
+         *  the owner 'activates' it with their chosen master key.
+         */
         //$dataset = $this->_dataset_repository->findDataset($id);
         //$uuid = $dataset->uuid;
         //$this->_repository->createDataset($id, null);
