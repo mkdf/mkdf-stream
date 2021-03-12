@@ -50,7 +50,7 @@ class StreamFeature implements DatasetsFeatureInterface
     }
 
     public function getLabel(){
-        return '<i class="fas fa-satellite-dish"></i> Stream API';
+        return '<i class="fas fa-satellite-dish"></i> API';
     }
 
     public function isActive(){
