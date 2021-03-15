@@ -6,7 +6,7 @@ namespace MKDF\Stream\Controller\Plugin;
 
 use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
 
-class StreamRepositoryPlugin
+class StreamRepositoryPlugin extends AbstractPlugin
 {
     private $_repository;
 

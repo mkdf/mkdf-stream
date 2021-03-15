@@ -7,6 +7,8 @@
 
 namespace MKDF\Stream;
 
+use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
+
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
 use MKDF\Stream\Feature\StreamFeature;
 use Zend\Mvc\MvcEvent;
@@ -26,6 +28,9 @@ class Module
      */
     public function onBootstrap(MvcEvent $event)
     {
+        $repository = $event->getApplication()->getServiceManager()->get(MKDFStreamRepositoryInterface::class);
+        $repository->init();
+
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(StreamFeature::class));
     }
