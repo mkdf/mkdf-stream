@@ -28,9 +28,6 @@ class Module
      */
     public function onBootstrap(MvcEvent $event)
     {
-        $repository = $event->getApplication()->getServiceManager()->get(MKDFStreamRepositoryInterface::class);
-        $repository->init();
-
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(StreamFeature::class));
     }
