@@ -5,6 +5,7 @@ namespace MKDF\Stream\Controller\Plugin;
 
 
 use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
+use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 class StreamRepositoryPlugin extends AbstractPlugin
 {

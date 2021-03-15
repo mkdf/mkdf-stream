@@ -8,7 +8,7 @@ use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
 
 class StreamRepositoryPluginFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke($container)
     {
         $repository = $container->get(MKDFStreamRepositoryInterface::class);
         return new StreamRepositoryPlugin($repository);

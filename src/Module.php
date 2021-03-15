@@ -7,8 +7,6 @@
 
 namespace MKDF\Stream;
 
-use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
-
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
 use MKDF\Stream\Feature\StreamFeature;
 use Zend\Mvc\MvcEvent;
