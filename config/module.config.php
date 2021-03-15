@@ -46,9 +46,11 @@ return [
     'controller_plugins' => [
         'factories' => [
             //Controller\Plugin\MKDFKeysRepositoryPlugin::class => Controller\Plugin\Factory\MKDFKeysRepositoryPluginFactory::class,
+            Controller\Plugin\StreamRepositoryPlugin::class => Controller\Plugin\Factory\StreamRepositoryPluginFactory::class,
         ],
         'aliases' => [
             //'MKDFKeysRepository' => Controller\Plugin\MKDFKeysRepositoryPlugin::class,
+            'streamRepository' => Controller\Plugin\StreamRepositoryPlugin::class,
         ]
     ],
     // The 'access_filter' key is used by the User module to restrict or permit
