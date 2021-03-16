@@ -10,10 +10,18 @@
                 <td><?= $this->escapeHtml($dataset->uuid) ?></th>
             </tr>
             <?php if ($can_read && $user_has_key): ?>
-            <tr>
-                <th>READ:</th>
-                <td><?= $this->escapeHtml($stream_url) ?></th>
-            </tr>
+                <tr>
+                    <th>READ:</th>
+                    <td><div style="font-size: 0.85em;"><?= $this->escapeHtml($read_url) ?></div></th>
+                </tr>
+                <tr>
+                    <th>BROWSE:</th>
+                    <td><div style="font-size: 0.85em;"><?= $this->escapeHtml($browse_url) ?></div></th>
+                </tr>
+                <tr>
+                    <th>API Explorer:</th>
+                    <td><div style="font-size: 0.85em;"><a href="<?= $this->escapeHtml($api_home) ?>" target="_blank"><?= $this->escapeHtml($api_home) ?></a></div></th>
+                </tr>
             <?php endif; ?>
             <tr>
                 <th>Total docs:</th>

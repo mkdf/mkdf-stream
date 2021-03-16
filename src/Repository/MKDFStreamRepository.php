@@ -17,11 +17,21 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
     }
 
     public function getApiReadHref($uuid) {
-        return ($this->_config['mkdf-stream']['public-url'] . '/query/' . $uuid);
+        //return ($this->_config['mkdf-stream']['public-url'] . '/data/query/' . $uuid);
+        return ('[GET] ' . $this->_config['mkdf-stream']['public-url'] . '/object/' . $uuid);
     }
 
     public function getApiWriteHref($uuid) {
-        return ($this->_config['mkdf-stream']['public-url'] . '/object/' . $uuid);
+        //return ($this->_config['mkdf-stream']['public-url'] . '/data/object/' . $uuid);
+        return ('[POST] ' . $this->_config['mkdf-stream']['public-url'] . '/object/' . $uuid);
+    }
+
+    public function getApiBrowseHref($uuid) {
+        return ('[GET] ' . $this->_config['mkdf-stream']['public-url'] . '/browse/' . $uuid);
+    }
+
+    public function getApiHome() {
+        return ($this->_config['mkdf-stream']['public-url']);
     }
 
     public function getCollectionList () {
