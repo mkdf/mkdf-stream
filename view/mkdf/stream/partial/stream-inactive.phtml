@@ -1,12 +1,12 @@
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Stream inactive</h5>
-        <h6 class="card-subtitle mb-2 text-muted">This Stream API has not yet been activated</h6>
+        <h5 class="card-title"><!--Stream-->API inactive</h5>
+        <h6 class="card-subtitle mb-2 text-muted">This <!--Stream--> API has not yet been activated</h6>
 
         <?php if($can_edit): ?>
-            <p class="card-text">In order to use this data stream, please select a key from the list below to
-                associate with the API. This key will have both read and write permissions. If you wish to first create a
-                new key, please visit your keys page.</p>
+            <p class="card-text">In order to use this data API, please select a key from the list below that
+                you wish to use for access. This key will have both read and write permissions. If you wish to first create a
+                new key, please visit your keys page via 'My Account'.</p>
 
             <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'activate'],[]); ?>" method="post" id="activate-form" name="activate-form">
                 <div class="form-group">
