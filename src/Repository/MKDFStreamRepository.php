@@ -96,6 +96,15 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $this->sendQuery("POST",$path, array('dataset-id'=>$uuid, 'read'=>$read, 'write'=>$write));
     }
 
+    public function getDocuments ($dataset,$numDocs,$key) {
+        $username = $key;
+        $password = $key;
+        $server = $this->_config['mkdf-stream']['server-url'];
+        $path = '/object/'.$dataset;
+        $url = $server . $path;
+        $curl = curl_init();
+    }
+
     public function pushDocument ($dataset,$document,$key=null) {
         $username = $this->_config['mkdf-stream']['user'];
         $password = $this->_config['mkdf-stream']['pass'];
