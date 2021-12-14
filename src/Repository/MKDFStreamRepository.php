@@ -96,13 +96,40 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $this->sendQuery("POST",$path, array('dataset-id'=>$uuid, 'read'=>$read, 'write'=>$write));
     }
 
-    public function getDocuments ($dataset,$numDocs,$key) {
+    public function getDocuments ($dataset,$numDocs,$key,$query = '{}') {
+        //$username = $this->_config['mkdf-stream']['user'];
+        //$password = $this->_config['mkdf-stream']['pass'];
         $username = $key;
         $password = $key;
         $server = $this->_config['mkdf-stream']['server-url'];
         $path = '/object/'.$dataset;
         $url = $server . $path;
+
+        $parameters = array('query' => $query);
+
+        $url = $url . '?' . http_build_query($parameters);
         $curl = curl_init();
+
+        $headers = array(
+            'Content-Type:application/json',
+            'Authorization: Basic '. base64_encode($username.":".$password) // <---
+        );
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => $headers,
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
     }
 
     public function pushDocument ($dataset,$document,$key=null) {
