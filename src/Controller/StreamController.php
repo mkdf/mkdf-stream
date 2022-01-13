@@ -45,6 +45,7 @@ class StreamController extends AbstractActionController
         $keys = [];
         //$userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
         $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id,$dataset->id);
+        $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
         if ($can_view) {
             $docCount = 0;
             $keys = [];
@@ -80,6 +81,7 @@ class StreamController extends AbstractActionController
                 'can_edit' => $can_edit,
                 'can_read' => $can_read,
                 'user_has_key' => $userHasKey,
+                'userDatasetKeys' => $userDatasetKeys,
             ]);
         }
         else{
