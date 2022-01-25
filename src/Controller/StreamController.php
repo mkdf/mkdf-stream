@@ -41,6 +41,7 @@ class StreamController extends AbstractActionController
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_read = $this->_permissionManager->canRead($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $can_write = $this->_permissionManager->canWrite($dataset,$user_id);
         $streamExists = $this->_repository->getStreamExists($dataset->uuid);
         $keys = [];
         //$userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
@@ -80,6 +81,7 @@ class StreamController extends AbstractActionController
                 'actions' => $actions,
                 'can_edit' => $can_edit,
                 'can_read' => $can_read,
+                'can_write' => $can_write,
                 'user_has_key' => $userHasKey,
                 'userDatasetKeys' => $userDatasetKeys,
             ]);
@@ -131,22 +133,47 @@ class StreamController extends AbstractActionController
 
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_read = $this->_permissionManager->canRead($dataset,$user_id);
+        $can_write = $this->_permissionManager->canWrite($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
 
-        if ($can_view && $can_read){
+        if ($can_view && ($can_read || $can_write)){
             $keys = [];
             if($this->getRequest()->isPost()) {
                 //Process form data and action the subscription
                 $data = $this->getRequest()->getPost();
                 $keyUuid = $data['api-key'];
+                $accessLevel = $data['access-level'];
                 $key = $this->_keys_repository->findKeyFromUuid($keyUuid,$user_id);
                 if(($dataset == null) || ($key == null)){
                     throw new \Exception('Key/Dataset not found');
                 }
+                print_r($accessLevel);
+                switch ($accessLevel) {
+                    case 'r':
+                        if ($can_read) {
+                            $this->_repository->addReadPermission($dataset->uuid, $keyUuid);
+                            $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'r');
+                            $this->flashMessenger()->addSuccessMessage('Registered read-only key to dataset API');
+                        }
+                    break;
+                    case 'a':
+                        if ($can_read && $can_write) {
+                            $this->_repository->addReadWritePermission($dataset->uuid, $keyUuid);
+                            $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
+                            $this->flashMessenger()->addSuccessMessage('Registered read/write key to dataset API');
+                        }
+                    break;
+                    case 'w':
+                        if ($can_write) {
+                            $this->_repository->addWritePermission($dataset->uuid, $keyUuid);
+                            $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'w');
+                            $this->flashMessenger()->addSuccessMessage('Registered write-only key to dataset API');
+                        }
+                    break;
+                    default:
+                        throw new \Exception('Unknown key type');
+                }
 
-                $this->_repository->addReadPermission($dataset->uuid, $keyUuid);
-                $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'r');
-                $this->flashMessenger()->addSuccessMessage('Subscribed to Stream API');
                 return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
             }
             else {
@@ -168,6 +195,8 @@ class StreamController extends AbstractActionController
                     'features' => $this->datasetsFeatureManager()->getFeatures($id),
                     'actions' => $actions,
                     'activate_url' => $activationLink,
+                    'can_read' => $can_read,
+                    'can_write' => $can_write
                 ]);
 
             }

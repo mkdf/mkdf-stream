@@ -53,10 +53,16 @@
                     print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td></tr>');
                 }
                 print ('</table>');
+
+            }
+
+            if ($can_read || $can_write) {
+
             }
 
         ?>
         <!-- Option to register new keys here -->
+
         </p>
 
     </div>

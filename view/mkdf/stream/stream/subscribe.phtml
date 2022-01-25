@@ -5,7 +5,7 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            <h2>Subscribe</h2>
+            <h2>Register a key</h2>
             <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 
 
@@ -14,19 +14,37 @@
                     <h5 class="card-title">Choose a key</h5>
 
                         <p class="card-text">Please select a key from the list below to
-                            subscribe to this Stream API. This key will be used to access the Stream API and will have read permissions.
+                            register for use with this dataset.
                             If you wish to first create a
-                            new key, please visit your keys page.</p>
+                            new key, please visit your keys page by clicking your email address in the top-right corner of
+                            the page and selecting <em>My Account</em>.</p>
+                            <!-- FIXME - Make this a link to the keys page for ease -->
 
                         <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'subscribe'],[]); ?>" method="post" id="subscribe-form" name="subscribe-form">
                             <div class="form-group">
                                 <label for="api-key">Select key:</label>
                                 <select class="form-control" id="api-key" name="api-key">
                                     <?php foreach ($keys as $key): ?>
+                                    <!-- FIXME - REMOVE keys from this list that are already registered to this dataset -->
                                         <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
                                     <?php endforeach; ?>
                                 </select>
                                 <br />
+
+                                <label for="access-level">Select access level:</label>
+                                <select class="form-control" id="access-level" name="access-level">
+                                    <?php if($can_read): ?>
+                                        <option value="r">Read only</option>
+                                    <?php endif; ?>
+                                    <?php if($can_write && $can_read): ?>
+                                        <option value="a">Read/write</option>
+                                    <?php endif; ?>
+                                    <?php if($can_write): ?>
+                                        <option value="w">Write only</option>
+                                    <?php endif; ?>
+                                </select>
+                                <br />
+
                                 <button type="submit" class="btn btn-primary">Subscribe</button>
                             </div>
                         </form>
