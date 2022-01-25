@@ -136,6 +136,9 @@ class StreamController extends AbstractActionController
         $can_write = $this->_permissionManager->canWrite($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
 
+        $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id,$dataset->id);
+        $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
+
         if ($can_view && ($can_read || $can_write)){
             $keys = [];
             if($this->getRequest()->isPost()) {
@@ -196,7 +199,9 @@ class StreamController extends AbstractActionController
                     'actions' => $actions,
                     'activate_url' => $activationLink,
                     'can_read' => $can_read,
-                    'can_write' => $can_write
+                    'can_write' => $can_write,
+                    'user_has_key' => $userHasKey,
+                    'userDatasetKeys' => $userDatasetKeys,
                 ]);
 
             }

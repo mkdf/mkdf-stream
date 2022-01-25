@@ -17,8 +17,11 @@
                             register for use with this dataset.
                             If you wish to first create a
                             new key, please visit your keys page by clicking your email address in the top-right corner of
-                            the page and selecting <em>My Account</em>.</p>
-                            <!-- FIXME - Make this a link to the keys page for ease -->
+                            the page and selecting <em>My Account</em>.<!-- FIXME - Make this a link to the keys page for ease -->
+                        </p>
+                    <p><em> Note that if a key is already listed below as being registered
+                            to this dataset, it cannot be registered again.</em></p>
+
 
                         <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'subscribe'],[]); ?>" method="post" id="subscribe-form" name="subscribe-form">
                             <div class="form-group">
@@ -26,6 +29,7 @@
                                 <select class="form-control" id="api-key" name="api-key">
                                     <?php foreach ($keys as $key): ?>
                                     <!-- FIXME - REMOVE keys from this list that are already registered to this dataset -->
+
                                         <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -45,9 +49,39 @@
                                 </select>
                                 <br />
 
-                                <button type="submit" class="btn btn-primary">Subscribe</button>
+                                <button type="submit" class="btn btn-primary">Register</button>
                             </div>
                         </form>
+                    <hr />
+
+                    <?php
+
+                    if ($user_has_key) {
+                        print('<h5>Your keys on this dataset</h5>');
+                        print ('<table class="table table-bordered">');
+                        print ('<tr><th>UUID / Description</th> <th>Permission</th></tr>');
+                        foreach ($userDatasetKeys as $key) {
+                            $permissionLabel = '';
+                            switch ($key['permission']) {
+                                case 'a':
+                                    $permissionLabel = 'read/write';
+                                    break;
+                                case 'r':
+                                    $permissionLabel = 'read';
+                                    break;
+                                case 'w':
+                                    $permissionLabel = 'write';
+                                    break;
+                                default:
+                                    $permissionLabel = 'unknown';
+                            }
+                            print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td></tr>');
+                        }
+                        print ('</table>');
+
+                    }
+
+                    ?>
 
 
 
