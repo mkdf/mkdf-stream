@@ -28,9 +28,18 @@
                                 <label for="api-key">Select key:</label>
                                 <select class="form-control" id="api-key" name="api-key">
                                     <?php foreach ($keys as $key): ?>
-                                    <!-- FIXME - REMOVE keys from this list that are already registered to this dataset -->
-
-                                        <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
+                                        <?php
+                                            $used = False;
+                                            foreach ($userDatasetKeys as $usedKey) {
+                                                if ($key->uuid == $usedKey['keyUUID']) {
+                                                    //This key has already been used on this dataset, can't select it again
+                                                    $used = True;
+                                                }
+                                            }
+                                        ?>
+                                        <?php if(!$used): ?>
+                                            <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </select>
                                 <br />
