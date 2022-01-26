@@ -31,7 +31,7 @@
 
         <?php
 
-            if ($can_read && $user_has_key) {
+            if ($user_has_key) {
                 print('<h5>Your keys on this dataset</h5>');
                 print ('<table class="table table-bordered">');
                 print ('<tr><th>UUID / Description</th> <th>Permission</th></tr>');
@@ -53,15 +53,21 @@
                     print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td></tr>');
                 }
                 print ('</table>');
-
+                $actions['buttons'][] = [
+                    'type' => 'primary',
+                    'label' => 'Register another key',
+                    'icon' => 'bookmark',
+                    'target' => 'stream',
+                    'params' => [
+                        'action' => 'subscribe',
+                        'id' => $dataset->id
+                    ]
+                ];
             }
-
-            if ($can_read || $can_write) {
-
-            }
-
         ?>
-        <!-- Option to register new keys here -->
+        <?php if($can_read || $can_write): ?>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+        <?php endif; ?>
 
         </p>
 
