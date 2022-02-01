@@ -34,7 +34,7 @@
             if ($user_has_key) {
                 print('<h5>Your keys on this dataset</h5>');
                 print ('<table class="table table-bordered">');
-                print ('<tr><th>UUID / Description</th> <th>Permission</th></tr>');
+                print ('<tr><th>UUID / Description</th> <th>Permission</th> <th>Actions</th></tr>');
                 foreach ($userDatasetKeys as $key) {
                     $permissionLabel = '';
                     switch ($key['permission']) {
@@ -50,7 +50,7 @@
                         default:
                             $permissionLabel = 'unknown';
                     }
-                    print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td></tr>');
+                    print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td><td>&nbsp;</td></tr>');
                 }
                 print ('</table>');
                 $actions['buttons'][] = [
