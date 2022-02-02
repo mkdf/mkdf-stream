@@ -31,10 +31,10 @@
 
         <?php
 
-            if ($can_read && $user_has_key) {
+            if ($user_has_key) {
                 print('<h5>Your keys on this dataset</h5>');
                 print ('<table class="table table-bordered">');
-                print ('<tr><th>UUID / Description</th> <th>Permission</th></tr>');
+                print ('<tr><th>UUID / Description</th> <th>Permission</th> <th>Actions</th></tr>');
                 foreach ($userDatasetKeys as $key) {
                     $permissionLabel = '';
                     switch ($key['permission']) {
@@ -50,12 +50,35 @@
                         default:
                             $permissionLabel = 'unknown';
                     }
-                    print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td></tr>');
+                    print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td>');
+                    print ('<td>');
+                    $deleteAction = [
+                        'class'=>'btn-group-sm',
+                        'buttons'=>[
+                            ['type'=>'primary','label'=>'', 'icon' => 'delete', 'target'=> 'stream', 'params'=> ['id' => $dataset->id, 'action' => 'removekey'], 'query' => ['key' => $key['keyUUID']]],
+                        ]
+                    ];
+                    print($this->partial('mkdf/core/partial/actions', $deleteAction));
+                    print ('</td></tr>');
+
                 }
                 print ('</table>');
+                $actions['buttons'][] = [
+                    'type' => 'primary',
+                    'label' => 'Register another key',
+                    'icon' => 'bookmark',
+                    'target' => 'stream',
+                    'params' => [
+                        'action' => 'subscribe',
+                        'id' => $dataset->id
+                    ]
+                ];
             }
-
         ?>
+        <?php if($can_read || $can_write): ?>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+        <?php endif; ?>
+
         </p>
 
     </div>

@@ -5,6 +5,7 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
             <!--<h2>Stream details</h2>-->
             <?php
             if ($can_read && !$user_has_key && $stream_exists){
@@ -37,6 +38,7 @@
                         'doc_count'     => $doc_count,
                         'dataset'       => $dataset,
                         'can_read'      => $can_read,
+                        'can_write'     => $can_write,
                         'user_has_key'  => $user_has_key,
                         'userDatasetKeys' => $userDatasetKeys,
                 ] ) ?>

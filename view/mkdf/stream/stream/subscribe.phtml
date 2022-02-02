@@ -5,7 +5,7 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            <h2>Subscribe</h2>
+            <h2>Register a key</h2>
             <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 
 
@@ -14,22 +14,83 @@
                     <h5 class="card-title">Choose a key</h5>
 
                         <p class="card-text">Please select a key from the list below to
-                            subscribe to this Stream API. This key will be used to access the Stream API and will have read permissions.
+                            register for use with this dataset.
                             If you wish to first create a
-                            new key, please visit your keys page.</p>
+                            new key, please visit your keys page by clicking your email address in the top-right corner of
+                            the page and selecting <em>My Account</em>.<!-- FIXME - Make this a link to the keys page for ease -->
+                        </p>
+                    <p><em> Note that if a key is already listed below as being registered
+                            to this dataset, it cannot be registered again.</em></p>
+
 
                         <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'subscribe'],[]); ?>" method="post" id="subscribe-form" name="subscribe-form">
                             <div class="form-group">
                                 <label for="api-key">Select key:</label>
                                 <select class="form-control" id="api-key" name="api-key">
                                     <?php foreach ($keys as $key): ?>
-                                        <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
+                                        <?php
+                                            $used = False;
+                                            foreach ($userDatasetKeys as $usedKey) {
+                                                if ($key->uuid == $usedKey['keyUUID']) {
+                                                    //This key has already been used on this dataset, can't select it again
+                                                    $used = True;
+                                                }
+                                            }
+                                        ?>
+                                        <?php if(!$used): ?>
+                                            <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 </select>
                                 <br />
-                                <button type="submit" class="btn btn-primary">Subscribe</button>
+
+                                <label for="access-level">Select access level:</label>
+                                <select class="form-control" id="access-level" name="access-level">
+                                    <?php if($can_read): ?>
+                                        <option value="r">Read only</option>
+                                    <?php endif; ?>
+                                    <?php if($can_write && $can_read): ?>
+                                        <option value="a">Read/write</option>
+                                    <?php endif; ?>
+                                    <?php if($can_write): ?>
+                                        <option value="w">Write only</option>
+                                    <?php endif; ?>
+                                </select>
+                                <br />
+
+                                <button type="submit" class="btn btn-primary">Register</button>
                             </div>
                         </form>
+                    <hr />
+
+                    <?php
+
+                    if ($user_has_key) {
+                        print('<h5>Your keys on this dataset</h5>');
+                        print ('<table class="table table-bordered">');
+                        print ('<tr><th>UUID / Description</th> <th>Permission</th></tr>');
+                        foreach ($userDatasetKeys as $key) {
+                            $permissionLabel = '';
+                            switch ($key['permission']) {
+                                case 'a':
+                                    $permissionLabel = 'read/write';
+                                    break;
+                                case 'r':
+                                    $permissionLabel = 'read';
+                                    break;
+                                case 'w':
+                                    $permissionLabel = 'write';
+                                    break;
+                                default:
+                                    $permissionLabel = 'unknown';
+                            }
+                            print ('<tr><td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td></tr>');
+                        }
+                        print ('</table>');
+
+                    }
+
+                    ?>
 
 
 

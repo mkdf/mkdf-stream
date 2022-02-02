@@ -37,10 +37,21 @@ class StreamController extends AbstractActionController
         $dataset = $this->_dataset_repository->findDataset($id);
         //$permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
+        $messages = [];
+        $flashMessenger = $this->flashMessenger();
+        if ($flashMessenger->hasMessages()) {
+            foreach($flashMessenger->getMessages() as $flashMessage) {
+                $messages[] = [
+                    'type' => 'warning',
+                    'message' => $flashMessage
+                ];
+            }
+        }
         $actions = [];
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_read = $this->_permissionManager->canRead($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
+        $can_write = $this->_permissionManager->canWrite($dataset,$user_id);
         $streamExists = $this->_repository->getStreamExists($dataset->uuid);
         $keys = [];
         //$userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
@@ -66,6 +77,7 @@ class StreamController extends AbstractActionController
             ];
             return new ViewModel([
                 'message' => $message,
+                'messages' => $messages,
                 'stream_exists' => $streamExists,
                 'doc_count' => $docCount,
                 'keys' => $keys,
@@ -80,12 +92,13 @@ class StreamController extends AbstractActionController
                 'actions' => $actions,
                 'can_edit' => $can_edit,
                 'can_read' => $can_read,
+                'can_write' => $can_write,
                 'user_has_key' => $userHasKey,
                 'userDatasetKeys' => $userDatasetKeys,
             ]);
         }
         else{
-            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            $this->flashMessenger()->addMessage('Unauthorised to view dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
@@ -112,7 +125,7 @@ class StreamController extends AbstractActionController
             if($can_edit && $keyUuid){
                 $this->_repository->createDataset($dataset->uuid, $keyUuid);
                 $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
-                $this->flashMessenger()->addSuccessMessage('The Stream API was activated successfully.');
+                $this->flashMessenger()->addMessage('The Stream API was activated successfully.');
                 return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
             }else{
                 // FIXME Better handling security
@@ -131,22 +144,50 @@ class StreamController extends AbstractActionController
 
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_read = $this->_permissionManager->canRead($dataset,$user_id);
+        $can_write = $this->_permissionManager->canWrite($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
 
-        if ($can_view && $can_read){
+        $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id,$dataset->id);
+        $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
+
+        if ($can_view && ($can_read || $can_write)){
             $keys = [];
             if($this->getRequest()->isPost()) {
                 //Process form data and action the subscription
                 $data = $this->getRequest()->getPost();
                 $keyUuid = $data['api-key'];
+                $accessLevel = $data['access-level'];
                 $key = $this->_keys_repository->findKeyFromUuid($keyUuid,$user_id);
                 if(($dataset == null) || ($key == null)){
                     throw new \Exception('Key/Dataset not found');
                 }
+                print_r($accessLevel);
+                switch ($accessLevel) {
+                    case 'r':
+                        if ($can_read) {
+                            $this->_repository->addReadPermission($dataset->uuid, $keyUuid);
+                            $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'r');
+                            $this->flashMessenger()->addMessage('Registered read-only key to dataset API');
+                        }
+                    break;
+                    case 'a':
+                        if ($can_read && $can_write) {
+                            $this->_repository->addReadWritePermission($dataset->uuid, $keyUuid);
+                            $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
+                            $this->flashMessenger()->addMessage('Registered read/write key to dataset API');
+                        }
+                    break;
+                    case 'w':
+                        if ($can_write) {
+                            $this->_repository->addWritePermission($dataset->uuid, $keyUuid);
+                            $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'w');
+                            $this->flashMessenger()->addMessage('Registered write-only key to dataset API');
+                        }
+                    break;
+                    default:
+                        throw new \Exception('Unknown key type');
+                }
 
-                $this->_repository->addReadPermission($dataset->uuid, $keyUuid);
-                $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'r');
-                $this->flashMessenger()->addSuccessMessage('Subscribed to Stream API');
                 return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
             }
             else {
@@ -168,16 +209,75 @@ class StreamController extends AbstractActionController
                     'features' => $this->datasetsFeatureManager()->getFeatures($id),
                     'actions' => $actions,
                     'activate_url' => $activationLink,
+                    'can_read' => $can_read,
+                    'can_write' => $can_write,
+                    'user_has_key' => $userHasKey,
+                    'userDatasetKeys' => $userDatasetKeys,
                 ]);
 
             }
         }
         else {
-            $this->flashMessenger()->addErrorMessage('Unauthorised to subscribe to dataset.');
+            $this->flashMessenger()->addMessage('Unauthorised to subscribe to dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
 
+    }
+
+    public function removekeyAction () {
+        $user_id = $this->currentUser()->getId();
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_dataset_repository->findDataset($id);
+        $keyPassed = $this->params()->fromQuery('key', null);
+        $token = $this->params()->fromQuery('token', null);
+
+        $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
+
+        if (!$this->userHasThisKeyOnDataset($keyPassed,$userDatasetKeys)) {
+            $this->flashMessenger()->addMessage('Remove key failed: You do not have access to this dataset with this key.');
+            return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
+        }
+
+        if (is_null($token)) {
+            $token = uniqid(true);
+            $container = new Container('Key_Management');
+            $container->delete_token = $token;
+            $messages[] = [
+                'type'=> 'warning',
+                'message' => 'Are you sure you want to remove your key\'s access to this dataset? Applications will no longer have access to the dataset with this key.'
+            ];
+            return new ViewModel(
+                [
+                    'dataset' => $dataset,
+                    'token' => $token,
+                    'key' => $keyPassed,
+                    'messages' => $messages
+                ]
+            );
+        }
+        else {
+            $container = new Container('Key_Management');
+            $valid_token = ($container->delete_token == $token);
+            if ($valid_token) {
+                // Delete key association here...
+                $this->_repository->removePermission($dataset->uuid, $keyPassed);
+                $this->_keys_repository->removeKeyUUIDPermission($keyPassed, $id);
+                $this->flashMessenger()->addMessage('Removed key access from dataset.');
+                return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
+            }
+        }
+
+    }
+
+    private function userHasThisKeyOnDataset ($key,$userDatasetKeys) {
+        //print_r ($userDatasetKeys);
+        foreach ($userDatasetKeys as $datasetKey) {
+            if ($datasetKey['keyUUID'] == $key) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
