@@ -214,4 +214,59 @@ class StreamController extends AbstractActionController
 
     }
 
+    public function removekeyAction () {
+        $user_id = $this->currentUser()->getId();
+        $id = (int) $this->params()->fromRoute('id', 0);
+        $dataset = $this->_dataset_repository->findDataset($id);
+        $keyPassed = $this->params()->fromQuery('key', null);
+        $token = $this->params()->fromQuery('token', null);
+
+        $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
+
+        if (!$this->userHasThisKeyOnDataset($keyPassed,$userDatasetKeys)) {
+            $this->flashMessenger()->addMessage('Remove key failed: You do not have access to this dataset with this key.');
+            return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
+        }
+
+        if (is_null($token)) {
+            $token = uniqid(true);
+            $container = new Container('Key_Management');
+            $container->delete_token = $token;
+            $messages[] = [
+                'type'=> 'warning',
+                'message' => 'Are you sure you want to remove your key\'s access to this dataset? You will no longer have access to the dataset with this key.'
+            ];
+            return new ViewModel(
+                [
+                    'dataset' => $dataset,
+                    'token' => $token,
+                    'key' => $keyPassed,
+                    'messages' => $messages
+                ]
+            );
+        }
+        else {
+            $container = new Container('Key_Management');
+            $valid_token = ($container->delete_token == $token);
+            if ($valid_token) {
+                // Delete key association here...
+                $this->_repository->removePermission($dataset->uuid, $keyPassed);
+                $this->_keys_repository->removeKeyUUIDPermission($keyPassed, $id);
+                $this->flashMessenger()->addSuccessMessage('Removed key access from dataset.');
+                return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
+            }
+        }
+
+    }
+
+    private function userHasThisKeyOnDataset ($key,$userDatasetKeys) {
+        //print_r ($userDatasetKeys);
+        foreach ($userDatasetKeys as $datasetKey) {
+            if ($datasetKey['keyUUID'] == $key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
