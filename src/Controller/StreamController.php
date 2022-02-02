@@ -37,6 +37,16 @@ class StreamController extends AbstractActionController
         $dataset = $this->_dataset_repository->findDataset($id);
         //$permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
+        $messages = [];
+        $flashMessenger = $this->flashMessenger();
+        if ($flashMessenger->hasMessages()) {
+            foreach($flashMessenger->getMessages() as $flashMessage) {
+                $messages[] = [
+                    'type' => 'warning',
+                    'message' => $flashMessage
+                ];
+            }
+        }
         $actions = [];
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_read = $this->_permissionManager->canRead($dataset,$user_id);
@@ -67,6 +77,7 @@ class StreamController extends AbstractActionController
             ];
             return new ViewModel([
                 'message' => $message,
+                'messages' => $messages,
                 'stream_exists' => $streamExists,
                 'doc_count' => $docCount,
                 'keys' => $keys,
@@ -87,7 +98,7 @@ class StreamController extends AbstractActionController
             ]);
         }
         else{
-            $this->flashMessenger()->addErrorMessage('Unauthorised to view dataset.');
+            $this->flashMessenger()->addMessage('Unauthorised to view dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
@@ -114,7 +125,7 @@ class StreamController extends AbstractActionController
             if($can_edit && $keyUuid){
                 $this->_repository->createDataset($dataset->uuid, $keyUuid);
                 $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
-                $this->flashMessenger()->addSuccessMessage('The Stream API was activated successfully.');
+                $this->flashMessenger()->addMessage('The Stream API was activated successfully.');
                 return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
             }else{
                 // FIXME Better handling security
@@ -156,21 +167,21 @@ class StreamController extends AbstractActionController
                         if ($can_read) {
                             $this->_repository->addReadPermission($dataset->uuid, $keyUuid);
                             $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'r');
-                            $this->flashMessenger()->addSuccessMessage('Registered read-only key to dataset API');
+                            $this->flashMessenger()->addMessage('Registered read-only key to dataset API');
                         }
                     break;
                     case 'a':
                         if ($can_read && $can_write) {
                             $this->_repository->addReadWritePermission($dataset->uuid, $keyUuid);
                             $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'a');
-                            $this->flashMessenger()->addSuccessMessage('Registered read/write key to dataset API');
+                            $this->flashMessenger()->addMessage('Registered read/write key to dataset API');
                         }
                     break;
                     case 'w':
                         if ($can_write) {
                             $this->_repository->addWritePermission($dataset->uuid, $keyUuid);
                             $this->_keys_repository->setKeyPermission($key->id, $dataset->id, 'w');
-                            $this->flashMessenger()->addSuccessMessage('Registered write-only key to dataset API');
+                            $this->flashMessenger()->addMessage('Registered write-only key to dataset API');
                         }
                     break;
                     default:
@@ -207,7 +218,7 @@ class StreamController extends AbstractActionController
             }
         }
         else {
-            $this->flashMessenger()->addErrorMessage('Unauthorised to subscribe to dataset.');
+            $this->flashMessenger()->addMessage('Unauthorised to subscribe to dataset.');
             return $this->redirect()->toRoute('dataset', ['action'=>'index']);
         }
 
@@ -234,7 +245,7 @@ class StreamController extends AbstractActionController
             $container->delete_token = $token;
             $messages[] = [
                 'type'=> 'warning',
-                'message' => 'Are you sure you want to remove your key\'s access to this dataset? You will no longer have access to the dataset with this key.'
+                'message' => 'Are you sure you want to remove your key\'s access to this dataset? Applications will no longer have access to the dataset with this key.'
             ];
             return new ViewModel(
                 [
@@ -252,7 +263,7 @@ class StreamController extends AbstractActionController
                 // Delete key association here...
                 $this->_repository->removePermission($dataset->uuid, $keyPassed);
                 $this->_keys_repository->removeKeyUUIDPermission($keyPassed, $id);
-                $this->flashMessenger()->addSuccessMessage('Removed key access from dataset.');
+                $this->flashMessenger()->addMessage('Removed key access from dataset.');
                 return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
             }
         }
