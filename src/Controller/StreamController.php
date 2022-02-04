@@ -229,7 +229,7 @@ class StreamController extends AbstractActionController
         $user_id = $this->currentUser()->getId();
         $id = (int) $this->params()->fromRoute('id', 0);
         $dataset = $this->_dataset_repository->findDataset($id);
-        $keyPassed = $this->params()->fromQuery('key', null);
+        $keyPassed = $this->params()->fromQuery('key', null); //KEY UUID passed on the query line
         $token = $this->params()->fromQuery('token', null);
 
         $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
@@ -267,7 +267,7 @@ class StreamController extends AbstractActionController
                 return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
             }
         }
-
+        return false;
     }
 
     private function userHasThisKeyOnDataset ($key,$userDatasetKeys) {
