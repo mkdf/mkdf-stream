@@ -159,7 +159,9 @@ class StreamController extends AbstractActionController
                 $accessLevel = $data['access-level'];
                 $key = $this->_keys_repository->findKeyFromUuid($keyUuid,$user_id);
                 if(($dataset == null) || ($key == null)){
-                    throw new \Exception('Key/Dataset not found');
+                    $this->flashMessenger()->addMessage('Key/Dataset not found');
+                    return $this->redirect()->toRoute('stream', ['action'=>'details','id'=>$id]);
+                    //throw new \Exception('Key/Dataset not found');
                 }
                 print_r($accessLevel);
                 switch ($accessLevel) {

@@ -27,6 +27,9 @@
                             <div class="form-group">
                                 <label for="api-key">Select key:</label>
                                 <select class="form-control" id="api-key" name="api-key">
+                                    <?php
+                                        $availableKeys = false;
+                                    ?>
                                     <?php foreach ($keys as $key): ?>
                                         <?php
                                             $used = False;
@@ -38,6 +41,7 @@
                                             }
                                         ?>
                                         <?php if(!$used): ?>
+                                            <?php $availableKeys = true; ?>
                                             <option value="<?= $key->uuid ?>"><?= $key->name.' - '.substr($key->description, 0,50)?> </option>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
@@ -58,7 +62,15 @@
                                 </select>
                                 <br />
 
-                                <button type="submit" class="btn btn-primary">Register</button>
+                                <?php if($availableKeys): ?>
+                                    <button type="submit" class="btn btn-primary">Register</button>
+                                <?php else: ?>
+                                <p class="">
+                                    <button type="submit" class="btn btn-secondary" disabled>Register</button>
+                                    <em><small>Please create a key in the My Account section to register with his dataset.</small></em>
+                                </p>
+                                <?php endif; ?>
+
                             </div>
                         </form>
                     <hr />
