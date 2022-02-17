@@ -33,10 +33,11 @@ class StreamController extends AbstractActionController
     public function detailsAction() {
         $user_id = $this->currentUser()->getId();
         $id = (int) $this->params()->fromRoute('id', 0);
-        //FIXME - Also make sure this is a stream dataset that we are retrieving.
         $dataset = $this->_dataset_repository->findDataset($id);
         //$permissions = $this->_repository->findDatasetPermissions($id);
         $message = "Dataset: " . $id;
+        $actions = [];
+
         $messages = [];
         $flashMessenger = $this->flashMessenger();
         if ($flashMessenger->hasMessages()) {
@@ -47,7 +48,7 @@ class StreamController extends AbstractActionController
                 ];
             }
         }
-        $actions = [];
+
         $can_view = $this->_permissionManager->canView($dataset,$user_id);
         $can_read = $this->_permissionManager->canRead($dataset,$user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset,$user_id);
@@ -235,9 +236,14 @@ class StreamController extends AbstractActionController
         $token = $this->params()->fromQuery('token', null);
 
         $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
-
-        if (!$this->userHasThisKeyOnDataset($keyPassed,$userDatasetKeys)) {
+        $permission = $this->userHasThisKeyOnDataset($keyPassed,$userDatasetKeys);
+        if (!$permission) {
             $this->flashMessenger()->addMessage('Remove key failed: You do not have access to this dataset with this key.');
+            return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
+        }
+
+        if (ctype_upper($permission)) {
+            $this->flashMessenger()->addMessage('Remove key failed: This key has been disabled and cannot be removed.');
             return $this->redirect()->toRoute('stream', ['action'=>'details', 'id' => $id]);
         }
 
@@ -276,7 +282,7 @@ class StreamController extends AbstractActionController
         //print_r ($userDatasetKeys);
         foreach ($userDatasetKeys as $datasetKey) {
             if ($datasetKey['keyUUID'] == $key) {
-                return true;
+                return $datasetKey['permission'];
             }
         }
         return false;

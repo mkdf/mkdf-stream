@@ -48,12 +48,15 @@
                             $permissionLabel = 'write';
                             break;
                         case 'd':
+                        case 'A':
+                        case 'R':
+                        case 'W':
                             $permissionLabel = 'disabled';
                             break;
                         default:
                             $permissionLabel = 'unknown';
                     }
-                    if ($key['permission'] == 'd') {
+                    if ($permissionLabel == 'disabled') {
                         print ('<tr class="table-secondary">');
                     }
                     else {
@@ -67,7 +70,10 @@
                             ['type'=>'primary','label'=>'Remove', 'icon' => 'delete', 'target'=> 'stream', 'params'=> ['id' => $dataset->id, 'action' => 'removekey'], 'query' => ['key' => $key['keyUUID']]],
                         ]
                     ];
-                    print($this->partial('mkdf/core/partial/actions', $deleteAction));
+                    if ($permissionLabel != 'disabled') {
+                        print($this->partial('mkdf/core/partial/actions', $deleteAction));
+                    }
+
                     print ('</td></tr>');
 
                 }
