@@ -18,7 +18,8 @@ return [
         ],
         'factories' => [
             Repository\MKDFStreamRepository::class => Repository\Factory\MKDFStreamRepositoryFactory::class,
-            Feature\StreamFeature::class => Feature\Factory\StreamFeatureFactory::class
+            Feature\StreamFeature::class => Feature\Factory\StreamFeatureFactory::class,
+            Feature\JSONFeature::class => Feature\Factory\JSONFeatureFactory::class,
         ]
     ],
     'router' => [

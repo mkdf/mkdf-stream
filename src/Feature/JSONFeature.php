@@ -7,7 +7,7 @@ use MKDF\Datasets\Repository\MKDFDatasetRepositoryInterface;
 use MKDF\Datasets\Service\DatasetsFeatureInterface;
 use MKDF\Stream\Repository\MKDFStreamRepositoryInterface;
 
-class StreamFeature implements DatasetsFeatureInterface
+class JSONFeature implements DatasetsFeatureInterface
 {
     private $active = false;
 
@@ -21,7 +21,7 @@ class StreamFeature implements DatasetsFeatureInterface
     }
 
     public function getController() {
-        return \MKDF\Stream\Controller\StreamController::class;
+        return \MKDF\Stream\Controller\JSONBrowserController::class;
     }
     public function getViewAction(){
         return 'details';
@@ -31,11 +31,11 @@ class StreamFeature implements DatasetsFeatureInterface
     }
 
     public function getViewHref($id){
-        return '/dataset/stream/details/'.$id;
+        return '/dataset/json/details/'.$id;
     }
 
     public function getEditHref($id){
-        return '/dataset/stream/details/'.$id;
+        return '/dataset/json/details/'.$id;
     }
 
     public function hasFeature($id){
@@ -50,7 +50,7 @@ class StreamFeature implements DatasetsFeatureInterface
     }
 
     public function getLabel(){
-        return '<i class="fas fa-laptop-code"></i> API';
+        return '<i class="fas fa-stream"></i> JSON';
     }
 
     public function isActive(){
