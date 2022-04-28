@@ -61,7 +61,7 @@ class JSONBrowserController extends AbstractActionController
         $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id, $dataset->id);
         $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id, $dataset->id);
 
-        if ($can_view) {
+        if ($can_view && $can_read && $userHasKey) {
             $docCount = 0;
             $keys = [];
             $activationLink = null;
@@ -78,6 +78,7 @@ class JSONBrowserController extends AbstractActionController
                 'buttons' => [
                 ]
             ];
+            $keys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
             return new ViewModel([
                 'message' => $message,
                 'messages' => $messages,

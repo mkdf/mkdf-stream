@@ -1,12 +1,159 @@
-<h1><?= $dataset->title ?> - JSON Browser</h1>
+<h1><?= $dataset->title ?></h1>
 <div class="container">
     <div class="row">
         <div class="col-md-3">
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            Controller content here<br>
-            Doc count: <?= $doc_count ?>
+            <h2>JSON Tools</h2>
+            Total document count: <?= $doc_count ?>
+            <form id="JSONQueryForm">
+                <div class="row">
+                    <div class="col-md-8"><label for="queryKey">Select a key to use for this query</label><br /></div>
+                    <div class="col-md-2"> </div>
+                    <div class="col-md-2">&nbsp;</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-8">
+
+                        <select class="custom-select custom-select-sm" id="queryKey">
+                            <?php
+                            foreach ($keys as $key) {
+                                if (($key['permission'] == 'a') || ($key['permission'] == 'r')) {
+                                    echo ("<option value='".$key['keyUUID']."'>".$key['keyName']." [".$key['keyUUID']."]</option>");
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+
+
+                    </div>
+                    <div class="col-md-2 align-baseline">
+                        <button type="submit" class="btn btn-primary btn-sm align-baseline"><i class="fas fa-play"></i> Go</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"><label for="pagesize">Pagesize</label><br /></div>
+                    <div class="col-md-2"><label for="page">Page</label><br /></div>
+                    <div class="col-md-4"><label for="sort">Sort</label><br /></div>
+                    <div class="col-md-4"><label for="fields">Fields</label><br /></div>
+
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-2">
+                        <input class="form-control form-control-sm"
+                               type="number"
+                               name="pagesize"
+                               id="pagesize"
+                               placeholder="10">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <input class="form-control form-control-sm"
+                               type="number"
+                               name="page"
+                               id="page"
+                               placeholder="1">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <input class="form-control form-control-sm"
+                               type="text"
+                               name="sort"
+                               id="sort"
+                               placeholder="sort by field name(s)">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <input class="form-control form-control-sm"
+                               type="text"
+                               name="fields"
+                               id="fields"
+                               placeholder="field projection">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12"><label for="query">Query</label><br /></div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <input class="form-control form-control-sm"
+                               type="text"
+                               name="query"
+                               id="query"
+                               placeholder="{}">
+                    </div>
+                </div>
+
+            </form>
+
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><!--Stream-->Results</h5>
+                    <!-- <h6 class="card-subtitle mb-2 text-muted">JSON results here...</h6> -->
+                    <div id="queryRunning" class="alert alert-primary" role="alert">
+                        Query running...
+                    </div>
+                    <div id="errorBox" class="alert alert-warning"Cr role="alert">
+                        Error
+                    </div>
+                    <div id="results">
+                        <!-- JSON results to appear here -->
+                        <pre class="renderjson">{}</pre>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="/js/renderjson.js"></script>
+<script>
+    $( document ).ready(function() {
+        $("#errorBox").hide();
+        $("#queryRunning").hide();
+    });
+
+    $('#JSONQueryForm').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation(); // only neccessary if something above is listening to the (default-)event too
+
+        $("#errorBox").hide();
+        $("#queryRunning").show();
+
+        var query = '{}';
+        var data = {
+            'query': query
+        };
+        var key = $("#queryKey").val();
+        var ajaxCall = $.ajax
+        ({
+            type: "GET",
+            url: "<?= $api_home ?>" +  "/browse/" + "<?= $dataset->uuid ?>",
+            dataType: 'text',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Basic " + btoa(key + ":" + key));
+            },
+            data: data,
+            success: function (){
+                //handled below
+            }
+        });
+
+        ajaxCall.done(function(text) {
+            $("#queryRunning").hide();
+            $("#errorBox").hide();
+            var resultsObj  = JSON.parse(text);
+            renderjson.set_show_to_level(2);
+            document.getElementById("results").innerHTML = '';
+            document.getElementById("results").appendChild(
+                renderjson(resultsObj)
+            );
+        });
+
+
+    });
+</script>
