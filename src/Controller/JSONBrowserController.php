@@ -101,8 +101,8 @@ class JSONBrowserController extends AbstractActionController
                 'userDatasetKeys' => $userDatasetKeys,
             ]);
         } else {
-            $this->flashMessenger()->addMessage('Unauthorised to view dataset.');
-            return $this->redirect()->toRoute('dataset', ['action' => 'index']);
+            $this->flashMessenger()->addMessage('You do not have any suitable keys registered to this dataset for browsing JSON documents. Please use the API tab to register an access key.');
+            return $this->redirect()->toRoute('dataset', ['action' => 'details', 'id' => $id]);
         }
     }
 
