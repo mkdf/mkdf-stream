@@ -8,7 +8,8 @@ use Zend\Router\Http\Segment;
 return [
     'controllers' => [
         'factories' => [
-            Controller\StreamController::class => Controller\Factory\StreamControllerFactory::class
+            Controller\StreamController::class => Controller\Factory\StreamControllerFactory::class,
+            Controller\JSONBrowserController::class => Controller\Factory\JSONBrowserControllerFactory::class,
         ],
     ],
     'service_manager' => [
@@ -17,7 +18,8 @@ return [
         ],
         'factories' => [
             Repository\MKDFStreamRepository::class => Repository\Factory\MKDFStreamRepositoryFactory::class,
-            Feature\StreamFeature::class => Feature\Factory\StreamFeatureFactory::class
+            Feature\StreamFeature::class => Feature\Factory\StreamFeatureFactory::class,
+            Feature\JSONFeature::class => Feature\Factory\JSONFeatureFactory::class,
         ]
     ],
     'router' => [
@@ -32,6 +34,20 @@ return [
                     ],
                     'defaults' => [
                         'controller' => Controller\StreamController::class,
+                        'action' => 'details'
+                    ],
+                ],
+            ],
+            'json' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/dataset/json/:action/:id',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\JSONBrowserController::class,
                         'action' => 'details'
                     ],
                 ],

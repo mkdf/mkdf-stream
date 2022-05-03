@@ -8,6 +8,7 @@
 namespace MKDF\Stream;
 
 use MKDF\Datasets\Service\DatasetsFeatureManagerInterface;
+use MKDF\Stream\Feature\JSONFeature;
 use MKDF\Stream\Feature\StreamFeature;
 use Zend\Mvc\MvcEvent;
 
@@ -28,5 +29,6 @@ class Module
     {
         $featureManager = $event->getApplication()->getServiceManager()->get(DatasetsFeatureManagerInterface::class);
         $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(StreamFeature::class));
+        $featureManager->registerFeature($event->getApplication()->getServiceManager()->get(JSONFeature::class));
     }
 }

@@ -1,0 +1,320 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>JSON - Browse</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><!--Stream-->Browse parameters</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Total items in dataset: <?= $this->escapeHtml($doc_count) ?></h6>
+
+
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="helpModalLabel">JSON Browse Parameters</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>Pagesize</h6>
+                                    <p>
+                                        The JSON browser operates a data paging system and does not return an unlimited number of documents
+                                        from the dataset at once. Use the <em>Pagesize</em> parameter to specify how many JSON documents are
+                                        returned at once. The default value is 100.
+                                    </p>
+                                    <h6>Page</h6>
+                                    <p>
+                                        Used in conjunction with the <em>Pagesize</em> parameter above, <em>Page</em> specifies the page number to return. For example,
+                                        if using a <em>Pagesize</em> of 10, <em>Page</em> 1 would return documents 1-10, <em>Page</em> 2
+                                        would return documents 11-20 and so on. The default value is 1.
+                                    </p>
+                                    <h6>Sort</h6>
+                                    <p>
+                                        Specify which fields you wish to sort your results by. Multiple fields can be specified, seperated with
+                                        a comma (no spaces). Sorting is perfomed in an ascending manner, fields can be sorting in the opposite order
+                                        (descending) by preceding each field name with a minus symbol. An example sort parameter, to sort data by descending <em>age</em>,
+                                        followed by <em>name</em> would be:<br />
+                                        <em>-age,name</em><br />
+                                        The default sort order, if left blank, is by descending timestamp.
+                                    </p>
+                                    <h6>Fields</h6>
+                                    <p>
+                                        Specify which fields to return from each JSON document. Fields should be seperated by a comma, with no spaces.
+                                        If you wish to return all fields but specifically exclude certain fields, specify those fields as a list with each field preceded
+                                        by a minus symbol. For example, to return all fields except the <em>name</em> and <em>age</em> fields:<br />
+                                        <em>-name,-age</em><br />
+                                        If left blank, the browser will return all fields by default.
+                                    </p>
+                                    <h6>Query</h6>
+                                    <p>
+                                        The JSON browser uses MongoDB's JSON-based query language for querying data. To specify equality
+                                        conditions, use &lt;field&gt;:&lt;value&gt; expressions in the query filter document:
+                                    <br />
+                                        <code>
+                                            {
+                                                "artworkType": "painting"
+                                            }
+                                        </code>
+                                    </p>
+                                    <p>
+                                        Multiple equality conditions can be specified, using commas to separate them:<br>
+                                        <code>
+                                            {
+                                                "artworkType": "painting",
+                                                "status": "archived"
+                                            }
+                                        </code>
+                                    </p>
+                                    <p>
+                                        Query operators can be used to construct more sophisticated queries and filter on a range of conditions.
+                                        For example, to select values greater than or equal to a particular value, the $gte operator can be used:<br />
+                                        <code>
+                                            {<br />
+                                            &nbsp;&nbsp;"artworkType": "painting",<br />
+                                            &nbsp;&nbsp;"status": "archived",<br />
+                                            &nbsp;&nbsp;"age": {<br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp;"$gte": 45<br />
+                                            &nbsp;&nbsp;}<br />
+                                            }
+                                        </code>
+                                    </p>
+                                    <p>
+                                        If left blank, all documents will be returned by default.
+                                    </p>
+                                    <p>
+                                        MongoDB provides a sophisticated query language that offers similar functionality to that
+                                        available in SQL. We recommend taking a look at the
+                                        <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/" target="_blank">
+                                            full documentation on constructing
+                                            MongoDB-style query documents which is available here
+                                        </a>.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="JSONQueryForm">
+
+
+                        <div class="row">
+                            <div class="col-md-2"><label for="pagesize">Pagesize</label><br /></div>
+                            <div class="col-md-2"><label for="page">Page</label><br /></div>
+                            <div class="col-md-4"><label for="sort">Sort</label><br /></div>
+                            <div class="col-md-4">
+                                <label for="fields">Fields</label>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-2">
+                                <input class="form-control form-control-sm"
+                                       type="number"
+                                       name="pagesize"
+                                       id="pagesize"
+                                       placeholder="100">
+                            </div>
+                            <div class="form-group col-md-2">
+                                <input class="form-control form-control-sm"
+                                       type="number"
+                                       name="page"
+                                       id="page"
+                                       placeholder="1">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <input class="form-control form-control-sm"
+                                       type="text"
+                                       name="sort"
+                                       id="sort"
+                                       placeholder="sort by field name(s)">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <input class="form-control form-control-sm"
+                                       type="text"
+                                       name="fields"
+                                       id="fields"
+                                       placeholder="field selection">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12"><label for="query">Query</label><br /></div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <input class="form-control form-control-sm"
+                                       type="text"
+                                       name="query"
+                                       id="query"
+                                       placeholder="{}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8"><label for="queryKey">Select a key to use for this query</label><br /></div>
+                            <div class="col-md-2"> </div>
+                            <div class="col-md-2">&nbsp;</div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-8">
+
+                                <select class="custom-select custom-select-sm" id="queryKey">
+                                    <?php
+                                    foreach ($keys as $key) {
+                                        if (($key['permission'] == 'a') || ($key['permission'] == 'r')) {
+                                            echo ("<option value='".$key['keyUUID']."'>".$key['keyName']." [".$key['keyUUID']."]</option>");
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary btn-sm align-baseline" data-toggle="modal" data-target="#helpModal">
+                                    <i class="fas fa-info-circle"></i> Help
+                                </button>
+                            </div>
+                            <div class="col-md-2 align-baseline">
+                                <button type="submit" class="btn btn-primary btn-sm align-baseline"><i class="fas fa-play"></i> Go</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+
+
+            <hr />
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><!--Stream-->Results</h5>
+                    <!-- <h6 class="card-subtitle mb-2 text-muted"></h6> -->
+                    <div id="queryRunning" class="alert alert-primary" role="alert">
+                        Query running...
+                    </div>
+                    <div id="errorBox" class="alert alert-warning"Cr role="alert">
+                        Error
+                    </div>
+                    <div id="results" style="max-height: 600px;" class="overflow-auto">
+                        <!-- JSON results to appear here -->
+                        <pre class="renderjson">{}</pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/js/renderjson.js"></script>
+<script>
+    $( document ).ready(function() {
+        $("#errorBox").hide();
+        $("#queryRunning").hide();
+    });
+
+    $('#JSONQueryForm').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation(); // only neccessary if something above is listening to the (default-)event too
+
+        $("#errorBox").hide();
+        $("#queryRunning").show();
+
+        //var query = '{}';
+        var query = $("#query").val();
+        var pagesize = $("#pagesize").val();
+        var page = $("#page").val();
+        var sort = $("#sort").val();
+        var fields = $("#fields").val();
+
+        var data = {
+            'query': query,
+            'pagesize': pagesize,
+            'page': page,
+            'sort': sort,
+            'fields': fields
+        };
+
+        // API doesn't like empty params for sort and field projection, so only send them if necessary
+        var dataToSend = {};
+        const dataKeys = Object.keys(data);
+        dataKeys.forEach((key, index) => {
+            if (data[key]) {
+                dataToSend[key] = data[key];
+            }
+        });
+
+        var key = $("#queryKey").val();
+
+        document.getElementById("results").innerHTML = '';
+        var ajaxCall = $.ajax
+        ({
+            type: "GET",
+            url: "<?= $api_home ?>" +  "/browse/" + "<?= $dataset->uuid ?>",
+            dataType: 'text',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Basic " + btoa(key + ":" + key));
+            },
+            data: dataToSend,
+            success: function (){
+                //handled below
+            }
+        });
+
+        ajaxCall.done(function(text) {
+            $("#queryRunning").hide();
+            $("#errorBox").hide();
+            var resultsObj  = JSON.parse(text);
+            renderjson.set_show_to_level(3);
+            document.getElementById("results").innerHTML = '';
+            document.getElementById("results").appendChild(
+                renderjson(resultsObj.results)
+            );
+        });
+
+        ajaxCall.fail(function(response) {
+            $("#queryRunning").hide();
+            var error;
+            error = response.responseText;
+            console.log(response);
+            /*
+            switch(response.status) {
+                case 400:
+                    error = "Error: Invalid SPARQL query";
+                    break;
+                case 401:
+                    error = "Authentication error: The key provided does not have read access on this dataset. Check that access for this key has not been disabled";
+                    break;
+                case 404:
+                    error = "Graph database not found. This dataset may not yet be enabled for SPARQL queries";
+                    break;
+                default:
+                    error = "An error occurred. The API may be offline or this dataset may not yet be activated";
+            }
+            */
+
+            $("#errorBox").html('Query failed: ' + error);
+            $("#errorBox").show();
+        });
+        ajaxCall.always(function() {
+            //this always runs when ajax complete regardless of the result
+        });
+
+
+    });
+</script>
