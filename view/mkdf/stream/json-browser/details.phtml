@@ -29,7 +29,7 @@
                                     <p>
                                         The JSON browser operates a data paging system and does not return an unlimited number of documents
                                         from the dataset at once. Use the <em>Pagesize</em> parameter to specify how many JSON documents are
-                                        returned at once. The defaul value is 100.
+                                        returned at once. The default value is 100.
                                     </p>
                                     <h6>Page</h6>
                                     <p>
@@ -41,15 +41,15 @@
                                     <p>
                                         Specify which fields you wish to sort your results by. Multiple fields can be specified, seperated with
                                         a comma (no spaces). Sorting is perfomed in an ascending manner, fields can be sorting in the opposite order
-                                        (descending) by preceding each field name with a minus symbol. An example sort parameter, so sort data by <em>age</em>
-                                        (descending), followed by <em>name</em> would be:<br />
+                                        (descending) by preceding each field name with a minus symbol. An example sort parameter, to sort data by descending <em>age</em>,
+                                        followed by <em>name</em> would be:<br />
                                         <em>-age,name</em><br />
-                                        The default sort order, if left blank, is by timestamp (descending).
+                                        The default sort order, if left blank, is by descending timestamp.
                                     </p>
                                     <h6>Fields</h6>
                                     <p>
                                         Specify which fields to return from each JSON document. Fields should be seperated by a comma, with no spaces.
-                                        If you wish to retuirn all fields but specifically exclude certain fields, specify those fields as a list which each field preceded
+                                        If you wish to return all fields but specifically exclude certain fields, specify those fields as a list with each field preceded
                                         by a minus symbol. For example, to return all fields except the <em>name</em> and <em>age</em> fields:<br />
                                         <em>-name,-age</em><br />
                                         If left blank, the browser will return all fields by default.
@@ -61,7 +61,7 @@
                                     <br />
                                         <code>
                                             {
-                                                "sensorStatus": "on"
+                                                "artworkType": "painting"
                                             }
                                         </code>
                                     </p>
@@ -69,8 +69,8 @@
                                         Multiple equality conditions can be specified, using commas to separate them:<br>
                                         <code>
                                             {
-                                                "sensorStatus": "on",
-                                                "sensorType": "humidity"
+                                                "artworkType": "painting",
+                                                "status": "archived"
                                             }
                                         </code>
                                     </p>
@@ -79,10 +79,10 @@
                                         For example, to select values greater than or equal to a particular value, the $gte operator can be used:<br />
                                         <code>
                                             {<br />
-                                            &nbsp;&nbsp;"sensorStatus": "on",<br />
-                                            &nbsp;&nbsp;"sensorType": "humidity",<br />
-                                            &nbsp;&nbsp;"humidity": {<br />
-                                            &nbsp;&nbsp;&nbsp;&nbsp;"$gte": 65<br />
+                                            &nbsp;&nbsp;"artworkType": "painting",<br />
+                                            &nbsp;&nbsp;"status": "archived",<br />
+                                            &nbsp;&nbsp;"age": {<br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp;"$gte": 45<br />
                                             &nbsp;&nbsp;}<br />
                                             }
                                         </code>
