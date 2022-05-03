@@ -12,6 +12,97 @@
                     <h5 class="card-title"><!--Stream-->Browse parameters</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Total items in dataset: <?= $this->escapeHtml($doc_count) ?></h6>
 
+
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="helpModalLabel">JSON Browse Parameters</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>Pagesize</h6>
+                                    <p>
+                                        The JSON browser operates a data paging system and does not return an unlimited number of documents
+                                        from the dataset at once. Use the <em>Pagesize</em> parameter to specify how many JSON documents are
+                                        returned at once. The defaul value is 100.
+                                    </p>
+                                    <h6>Page</h6>
+                                    <p>
+                                        Used in conjunction with the <em>Pagesize</em> parameter above, <em>Page</em> specifies the page number to return. For example,
+                                        if using a <em>Pagesize</em> of 10, <em>Page</em> 1 would return documents 1-10, <em>Page</em> 2
+                                        would return documents 11-20 and so on. The default value is 1.
+                                    </p>
+                                    <h6>Sort</h6>
+                                    <p>
+                                        Specify which fields you wish to sort your results by. Multiple fields can be specified, seperated with
+                                        a comma (no spaces). Sorting is perfomed in an ascending manner, fields can be sorting in the opposite order
+                                        (descending) by preceding each field name with a minus symbol. An example sort parameter, so sort data by <em>age</em>
+                                        (descending), followed by <em>name</em> would be:<br />
+                                        <em>-age,name</em><br />
+                                        The default sort order, if left blank, is by timestamp (descending).
+                                    </p>
+                                    <h6>Fields</h6>
+                                    <p>
+                                        Specify which fields to return from each JSON document. Fields should be seperated by a comma, with no spaces.
+                                        If you wish to retuirn all fields but specifically exclude certain fields, specify those fields as a list which each field preceded
+                                        by a minus symbol. For example, to return all fields except the <em>name</em> and <em>age</em> fields:<br />
+                                        <em>-name,-age</em><br />
+                                        If left blank, the browser will return all fields by default.
+                                    </p>
+                                    <h6>Query</h6>
+                                    <p>
+                                        The JSON browser uses MongoDB's JSON-based query language for querying data. To specify equality
+                                        conditions, use &lt;field&gt;:&lt;value&gt; expressions in the query filter document:
+                                    <br />
+                                        <code>
+                                            {
+                                                "sensorStatus": "on"
+                                            }
+                                        </code>
+                                    </p>
+                                    <p>
+                                        Multiple equality conditions can be specified, using commas to separate them:<br>
+                                        <code>
+                                            {
+                                                "sensorStatus": "on",
+                                                "sensorType": "humidity"
+                                            }
+                                        </code>
+                                    </p>
+                                    <p>
+                                        Query operators can be used to construct more sophisticated queries and filter on a range of conditions.
+                                        For example, to select values greater than or equal to a particular value, the $gte operator can be used:<br />
+                                        <code>
+                                            {<br />
+                                            &nbsp;&nbsp;"sensorStatus": "on",<br />
+                                            &nbsp;&nbsp;"sensorType": "humidity",<br />
+                                            &nbsp;&nbsp;"humidity": {<br />
+                                            &nbsp;&nbsp;&nbsp;&nbsp;"$gte": 65<br />
+                                            &nbsp;&nbsp;}<br />
+                                            }
+                                        </code>
+                                    </p>
+                                    <p>
+                                        MongoDB provides a sophisticated query language that offers similar functionality to that
+                                        available in SQL. We recommend taking a look at the
+                                        <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/" target="_blank">
+                                            full documentation on constructing
+                                            MongoDB-style query documents which is available here
+                                        </a>.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <form id="JSONQueryForm">
 
 
@@ -19,7 +110,9 @@
                             <div class="col-md-2"><label for="pagesize">Pagesize</label><br /></div>
                             <div class="col-md-2"><label for="page">Page</label><br /></div>
                             <div class="col-md-4"><label for="sort">Sort</label><br /></div>
-                            <div class="col-md-4"><label for="fields">Fields</label><br /></div>
+                            <div class="col-md-4">
+                                <label for="fields">Fields</label>
+                            </div>
 
                         </div>
                         <div class="row">
@@ -85,8 +178,10 @@
                                 </select>
                             </div>
                             <div class="form-group col-md-2">
-
-
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary btn-sm align-baseline" data-toggle="modal" data-target="#helpModal">
+                                    <i class="fas fa-info-circle"></i> Help
+                                </button>
                             </div>
                             <div class="col-md-2 align-baseline">
                                 <button type="submit" class="btn btn-primary btn-sm align-baseline"><i class="fas fa-play"></i> Go</button>
