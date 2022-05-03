@@ -5,101 +5,114 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            <h2>JSON Tools</h2>
-            Total document count: <?= $doc_count ?>
-            <form id="JSONQueryForm">
-                <div class="row">
-                    <div class="col-md-8"><label for="queryKey">Select a key to use for this query</label><br /></div>
-                    <div class="col-md-2"> </div>
-                    <div class="col-md-2">&nbsp;</div>
+            <h2>JSON Tools - Browse</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><!--Stream-->Browse parameters</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Total items in dataset: <?= $this->escapeHtml($doc_count) ?></h6>
+
+                    <form id="JSONQueryForm">
+
+
+                        <div class="row">
+                            <div class="col-md-2"><label for="pagesize">Pagesize</label><br /></div>
+                            <div class="col-md-2"><label for="page">Page</label><br /></div>
+                            <div class="col-md-4"><label for="sort">Sort</label><br /></div>
+                            <div class="col-md-4"><label for="fields">Fields</label><br /></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-2">
+                                <input class="form-control form-control-sm"
+                                       type="number"
+                                       name="pagesize"
+                                       id="pagesize"
+                                       placeholder="100">
+                            </div>
+                            <div class="form-group col-md-2">
+                                <input class="form-control form-control-sm"
+                                       type="number"
+                                       name="page"
+                                       id="page"
+                                       placeholder="1">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <input class="form-control form-control-sm"
+                                       type="text"
+                                       name="sort"
+                                       id="sort"
+                                       placeholder="sort by field name(s)">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <input class="form-control form-control-sm"
+                                       type="text"
+                                       name="fields"
+                                       id="fields"
+                                       placeholder="field selection">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12"><label for="query">Query</label><br /></div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <input class="form-control form-control-sm"
+                                       type="text"
+                                       name="query"
+                                       id="query"
+                                       placeholder="{}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8"><label for="queryKey">Select a key to use for this query</label><br /></div>
+                            <div class="col-md-2"> </div>
+                            <div class="col-md-2">&nbsp;</div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-8">
+
+                                <select class="custom-select custom-select-sm" id="queryKey">
+                                    <?php
+                                    foreach ($keys as $key) {
+                                        if (($key['permission'] == 'a') || ($key['permission'] == 'r')) {
+                                            echo ("<option value='".$key['keyUUID']."'>".$key['keyName']." [".$key['keyUUID']."]</option>");
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-2">
+
+
+                            </div>
+                            <div class="col-md-2 align-baseline">
+                                <button type="submit" class="btn btn-primary btn-sm align-baseline"><i class="fas fa-play"></i> Go</button>
+                            </div>
+                        </div>
+
+                    </form>
+
                 </div>
-                <div class="row">
-                    <div class="form-group col-md-8">
-
-                        <select class="custom-select custom-select-sm" id="queryKey">
-                            <?php
-                            foreach ($keys as $key) {
-                                if (($key['permission'] == 'a') || ($key['permission'] == 'r')) {
-                                    echo ("<option value='".$key['keyUUID']."'>".$key['keyName']." [".$key['keyUUID']."]</option>");
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-2">
+            </div>
 
 
-                    </div>
-                    <div class="col-md-2 align-baseline">
-                        <button type="submit" class="btn btn-primary btn-sm align-baseline"><i class="fas fa-play"></i> Go</button>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-2"><label for="pagesize">Pagesize</label><br /></div>
-                    <div class="col-md-2"><label for="page">Page</label><br /></div>
-                    <div class="col-md-4"><label for="sort">Sort</label><br /></div>
-                    <div class="col-md-4"><label for="fields">Fields</label><br /></div>
-
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-2">
-                        <input class="form-control form-control-sm"
-                               type="number"
-                               name="pagesize"
-                               id="pagesize"
-                               placeholder="10">
-                    </div>
-                    <div class="form-group col-md-2">
-                        <input class="form-control form-control-sm"
-                               type="number"
-                               name="page"
-                               id="page"
-                               placeholder="1">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <input class="form-control form-control-sm"
-                               type="text"
-                               name="sort"
-                               id="sort"
-                               placeholder="sort by field name(s)">
-                    </div>
-                    <div class="form-group col-md-4">
-                        <input class="form-control form-control-sm"
-                               type="text"
-                               name="fields"
-                               id="fields"
-                               placeholder="field projection">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12"><label for="query">Query</label><br /></div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-12">
-                        <input class="form-control form-control-sm"
-                               type="text"
-                               name="query"
-                               id="query"
-                               placeholder="{}">
-                    </div>
-                </div>
-
-            </form>
-
+            <hr />
 
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title"><!--Stream-->Results</h5>
-                    <!-- <h6 class="card-subtitle mb-2 text-muted">JSON results here...</h6> -->
+                    <!-- <h6 class="card-subtitle mb-2 text-muted"></h6> -->
                     <div id="queryRunning" class="alert alert-primary" role="alert">
                         Query running...
                     </div>
                     <div id="errorBox" class="alert alert-warning"Cr role="alert">
                         Error
                     </div>
-                    <div id="results">
+                    <div id="results" style="max-height: 600px;" class="overflow-auto">
                         <!-- JSON results to appear here -->
                         <pre class="renderjson">{}</pre>
                     </div>
@@ -124,11 +137,33 @@
         $("#errorBox").hide();
         $("#queryRunning").show();
 
-        var query = '{}';
+        //var query = '{}';
+        var query = $("#query").val();
+        var pagesize = $("#pagesize").val();
+        var page = $("#page").val();
+        var sort = $("#sort").val();
+        var fields = $("#fields").val();
+
         var data = {
-            'query': query
+            'query': query,
+            'pagesize': pagesize,
+            'page': page,
+            'sort': sort,
+            'fields': fields
         };
+
+        // API doesn't like empty params for sort and field projection, so only send them if necessary
+        var dataToSend = {};
+        const dataKeys = Object.keys(data);
+        dataKeys.forEach((key, index) => {
+            if (data[key]) {
+                dataToSend[key] = data[key];
+            }
+        });
+
         var key = $("#queryKey").val();
+
+        document.getElementById("results").innerHTML = '';
         var ajaxCall = $.ajax
         ({
             type: "GET",
@@ -137,7 +172,7 @@
             beforeSend: function (xhr) {
                 xhr.setRequestHeader ("Authorization", "Basic " + btoa(key + ":" + key));
             },
-            data: data,
+            data: dataToSend,
             success: function (){
                 //handled below
             }
@@ -147,11 +182,39 @@
             $("#queryRunning").hide();
             $("#errorBox").hide();
             var resultsObj  = JSON.parse(text);
-            renderjson.set_show_to_level(2);
+            renderjson.set_show_to_level(3);
             document.getElementById("results").innerHTML = '';
             document.getElementById("results").appendChild(
-                renderjson(resultsObj)
+                renderjson(resultsObj.results)
             );
+        });
+
+        ajaxCall.fail(function(response) {
+            $("#queryRunning").hide();
+            var error;
+            error = response.responseText;
+            console.log(response);
+            /*
+            switch(response.status) {
+                case 400:
+                    error = "Error: Invalid SPARQL query";
+                    break;
+                case 401:
+                    error = "Authentication error: The key provided does not have read access on this dataset. Check that access for this key has not been disabled";
+                    break;
+                case 404:
+                    error = "Graph database not found. This dataset may not yet be enabled for SPARQL queries";
+                    break;
+                default:
+                    error = "An error occurred. The API may be offline or this dataset may not yet be activated";
+            }
+            */
+
+            $("#errorBox").html('Query failed: ' + error);
+            $("#errorBox").show();
+        });
+        ajaxCall.always(function() {
+            //this always runs when ajax complete regardless of the result
         });
 
 
