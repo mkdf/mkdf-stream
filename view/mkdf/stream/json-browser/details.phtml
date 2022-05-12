@@ -7,7 +7,7 @@
         <div class="col-md-9">
             <h2>JSON - Browse</h2>
 
-            <? if ($stream_exists): ?>
+            <?php if ($stream_exists): ?>
 
             <div class="card">
                 <div class="card-body">
@@ -201,6 +201,9 @@
 
 
             <hr />
+            <!-- RESULTS HERE -->
+
+
 
             <div class="card">
                 <div class="card-body">
@@ -212,16 +215,52 @@
                     <div id="errorBox" class="alert alert-warning"Cr role="alert">
                         Error
                     </div>
-                    <div id="results" style="max-height: 600px;" class="overflow-auto">
-                        <!-- JSON results to appear here -->
-                        <pre class="renderjson">{}</pre>
+
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="tabular-tab" data-toggle="tab" href="#tabular" role="tab" aria-controls="tabular" aria-selected="true">Data table</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="json-tab" data-toggle="tab" href="#json" role="tab" aria-controls="json" aria-selected="false">Raw JSON</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+
+                        <div class="tab-pane fade show active" id="tabular" role="tabpanel" aria-labelledby="tabular-tab">
+                            <div id="datatablediv" style="max-height: 600px;" class="overflow-auto">
+                                <!-- JSON results to appear here -->
+                                <table class="table table-striped" id="datatable">
+                                    <thead>
+                                    <tr>
+                                        <!-- <th scope="col">_id</th> -->
+                                        <!-- <th scope="col">Last edited</th> -->
+                                        <th scope="col">JSON</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade " id="json" role="tabpanel" aria-labelledby="json-tab">
+                            <div id="results" style="max-height: 600px;" class="overflow-auto">
+                                <!-- JSON results to appear here -->
+                                <pre class="renderjson">{}</pre>
+                            </div>
+                        </div>
+
                     </div>
+
+
                 </div>
             </div>
 
-            <? else: ?>
+            <?php else: ?>
                 <p>Stream not yet activated</p>
-            <? endif; ?>
+            <?php endif; ?>
 
         </div>
 
@@ -292,6 +331,7 @@
             document.getElementById("results").appendChild(
                 renderjson(resultsObj.results)
             );
+            buildResultsTable(resultsObj.results);
         });
 
         ajaxCall.fail(function(response) {
@@ -299,21 +339,6 @@
             var error;
             error = response.responseText;
             console.log(response);
-            /*
-            switch(response.status) {
-                case 400:
-                    error = "Error: Invalid SPARQL query";
-                    break;
-                case 401:
-                    error = "Authentication error: The key provided does not have read access on this dataset. Check that access for this key has not been disabled";
-                    break;
-                case 404:
-                    error = "Graph database not found. This dataset may not yet be enabled for SPARQL queries";
-                    break;
-                default:
-                    error = "An error occurred. The API may be offline or this dataset may not yet be activated";
-            }
-            */
 
             $("#errorBox").html('Query failed: ' + error);
             $("#errorBox").show();
@@ -321,6 +346,21 @@
         ajaxCall.always(function() {
             //this always runs when ajax complete regardless of the result
         });
+
+        function buildResultsTable (data) {
+            $('#datatable > tbody').empty();
+            for (i = 0; i < data.length; i++) {
+                dateTimeStr = data[i]._timestamp_day + '/' + data[i]._timestamp_month + '/' + data[i]._timestamp_year + ' ' + data[i]._timestamp_hour + ':' + data[i]._timestamp_minute;
+                prettyJson = JSON.stringify(data[i],null,'  ');
+                html = '<tr>';
+                //html += '<td><small>' + data[i]._id + '</small></td>';
+                //html += '<td><small>' + dateTimeStr + '</small></td>';
+                html += '<td><small><pre>' + prettyJson + '</pre></small></td>';
+                html += '<td> edit </td>';
+                $('#datatable > tbody:last-child').append(html);
+            }
+            return true;
+        }
 
 
     });
