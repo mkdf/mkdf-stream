@@ -5,6 +5,7 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
             <h2>JSON - Browse</h2>
 
             <?php if ($stream_exists): ?>
@@ -292,6 +293,7 @@
 
     });
 
+    var keyUsed = '';
     var keyUsedPermission = '';
 
     $('#JSONQueryForm').on('submit', function(e) {
@@ -306,7 +308,9 @@
         var pagesize = $("#pagesize").val();
         var page = $("#page").val();
         var sort = $("#sort").val();
-        var fields = $("#fields").val();
+        var fields = enforceIdField($("#fields").val());
+
+        // FIXME - ensure '_id' field is not omitted from fields. If specifically omitted, add it back in, as it's used for edit/dete refs
 
         var data = {
             'query': query,
@@ -326,6 +330,7 @@
         });
 
         var key = $("#queryKey").val();
+        keyUsed = key;
         keyUsedPermission = keyPermissions[key];
 
         document.getElementById("results").innerHTML = '';
@@ -372,6 +377,7 @@
             $('#datatable > tbody').empty();
             for (i = 0; i < data.length; i++) {
                 dateTimeStr = data[i]._timestamp_day + '/' + data[i]._timestamp_month + '/' + data[i]._timestamp_year + ' ' + data[i]._timestamp_hour + ':' + data[i]._timestamp_minute;
+                var docID = data[i]._id;
                 prettyJson = JSON.stringify(data[i],null,'  ');
                 html = '<tr>';
                 //html += '<td><small>' + data[i]._id + '</small></td>';
@@ -379,8 +385,8 @@
                 html += '<td><small><pre style="max-width: 580px;">' + prettyJson + '</pre></small></td>';
                 html += '<td>';
                 if (keyUsedPermission == 'a') {
-                    html += '<a class="btn btn-sm btn-warning" href="/dataset/json/deletedoc/10?docid=b5790a0f-c735-4a59-b68f-3259d719e926"><i class="fas fa-edit"></i> Edit</a><br />';
-                    html += '<a class="btn btn-sm btn-danger" href="/dataset/json/editdoc/10?docid=b5790a0f-c735-4a59-b68f-3259d719e926"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    html += '<a class="btn btn-sm btn-warning" href="/dataset/json/writedoc/10?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-edit"></i> Edit</a><br />';
+                    html += '<a class="btn btn-sm btn-danger" href="/dataset/json/deletedoc/10?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-trash-alt"></i> Delete</a>';
                 }
                 else {
                     html += '<button type="button" class="btn btn-sm btn-warning" disabled><i class="fas fa-edit"></i> Edit</button><br />';
@@ -390,6 +396,18 @@
                 $('#datatable > tbody:last-child').append(html);
             }
             return true;
+        }
+
+        function enforceIdField (fieldInput) {
+            fieldItems = fieldInput.split(',');
+            newItems = [];
+            for (i = 0; i < fieldItems.length; i++) {
+                if (fieldItems[i] != '-_id') {
+                    newItems.push(fieldItems[i]);
+                }
+            }
+            fieldOutput = newItems.join(',');
+            return fieldOutput;
         }
     });
 </script>

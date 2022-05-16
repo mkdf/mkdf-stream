@@ -1,0 +1,14 @@
+<h1>Delete JSON document</h1>
+<?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+<!-- Token: <?= $token ?> -->
+<p>
+    Deleting document: <em><?= $docid ?></em><br />
+    Using key: <em><?= $key ?></em><br />
+    <em>Please note that this process cannot be undone.</em>
+</p>
+<?= $this->partial('mkdf/core/partial/actions', [
+    'buttons'=>[
+        ['type'=>'danger','label'=>'Yes, delete this JSON document', 'target'=> 'json', 'params'=> ['id' => $dataset->id, 'action' => 'deletedoc'], 'query' => ['token' => $token, 'docid' => $docid, 'key' => $key]],
+        ['type'=>'secondary','label'=>'No, go back please', 'target'=> 'json', 'params'=> ['id' => $dataset->id, 'action' => 'details']]]
+] ); ?>
+
