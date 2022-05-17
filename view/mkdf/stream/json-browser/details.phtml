@@ -399,8 +399,6 @@
         var sort = $("#sort").val();
         var fields = enforceIdField($("#fields").val());
 
-        // FIXME - ensure '_id' field is not omitted from fields. If specifically omitted, add it back in, as it's used for edit/dete refs
-
         var data = {
             'query': query,
             'pagesize': pagesize,
@@ -474,8 +472,8 @@
                 html += '<td><small><pre style="max-width: 580px;">' + prettyJson + '</pre></small></td>';
                 html += '<td>';
                 if (keyUsedPermission == 'a') {
-                    html += '<a class="btn btn-sm btn-warning" href="/dataset/json/writedoc/10?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-edit"></i> Edit</a><br />';
-                    html += '<a class="btn btn-sm btn-danger" href="/dataset/json/deletedoc/10?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                    html += '<a class="btn btn-sm btn-warning" href="/dataset/json/writedoc/<?= $dataset->id ?>?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-edit"></i> Edit</a><br />';
+                    html += '<a class="btn btn-sm btn-danger" href="/dataset/json/deletedoc/<?= $dataset->id ?>?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-trash-alt"></i> Delete</a>';
                 }
                 else {
                     html += '<button type="button" class="btn btn-sm btn-warning" disabled><i class="fas fa-edit"></i> Edit</button><br />';
