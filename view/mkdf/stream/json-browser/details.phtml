@@ -5,9 +5,11 @@
             <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
         </div>
         <div class="col-md-9">
-            <h2>JSON - Browse</h2>
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+            <h2>JSON Tools</h2>
 
-            <? if ($stream_exists): ?>
+            <?php if ($stream_exists): ?>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 
             <div class="card">
                 <div class="card-body">
@@ -16,12 +18,12 @@
 
 
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+                    <!-- Modals -->
+                    <div class="modal fade" id="pagesizeModal" tabindex="-1" aria-labelledby="pagesizeModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="helpModalLabel">JSON Browse Parameters</h5>
+                                    <h5 class="modal-title" id="pagesizeModalLabel">JSON Browse Parameters</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -33,21 +35,75 @@
                                         from the dataset at once. Use the <em>Pagesize</em> parameter to specify how many JSON documents are
                                         returned at once. The default value is 100.
                                     </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ******************* -->
+                    <div class="modal fade" id="pageModal" tabindex="-1" aria-labelledby="pageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="pageModalLabel">JSON Browse Parameters</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
                                     <h6>Page</h6>
                                     <p>
                                         Used in conjunction with the <em>Pagesize</em> parameter above, <em>Page</em> specifies the page number to return. For example,
                                         if using a <em>Pagesize</em> of 10, <em>Page</em> 1 would return documents 1-10, <em>Page</em> 2
                                         would return documents 11-20 and so on. The default value is 1.
                                     </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ******************* -->
+                    <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="sortModalLabel">JSON Browse Parameters</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
                                     <h6>Sort</h6>
                                     <p>
                                         Specify which fields you wish to sort your results by. Multiple fields can be specified, seperated with
-                                        a comma (no spaces). Sorting is perfomed in an ascending manner, fields can be sorting in the opposite order
+                                        a comma (no spaces). Sorting is performed in an ascending manner, fields can be sorting in the opposite order
                                         (descending) by preceding each field name with a minus symbol. An example sort parameter, to sort data by descending <em>age</em>,
                                         followed by <em>name</em> would be:<br />
                                         <em>-age,name</em><br />
                                         The default sort order, if left blank, is by descending timestamp.
                                     </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ******************* -->
+                    <div class="modal fade" id="fieldsModal" tabindex="-1" aria-labelledby="fieldsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="fieldsModalLabel">JSON Browse Parameters</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
                                     <h6>Fields</h6>
                                     <p>
                                         Specify which fields to return from each JSON document. Fields should be seperated by a comma, with no spaces.
@@ -56,6 +112,24 @@
                                         <em>-name,-age</em><br />
                                         If left blank, the browser will return all fields by default.
                                     </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ******************* -->
+                    <div class="modal fade" id="queryModal" tabindex="-1" aria-labelledby="queryModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="queryModalLabel">JSON Browse Parameters</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
                                     <h6>Query</h6>
                                     <p>
                                         The JSON browser uses MongoDB's JSON-based query language for querying data. To specify equality
@@ -112,11 +186,23 @@
 
 
                         <div class="row">
-                            <div class="col-md-2"><label for="pagesize">Pagesize</label><br /></div>
-                            <div class="col-md-2"><label for="page">Page</label><br /></div>
-                            <div class="col-md-4"><label for="sort">Sort</label><br /></div>
+                            <div class="col-md-2"><label for="pagesize">Pagesize</label>
+                                <a href="#" data-toggle="modal" data-target="#pagesizeModal">
+                                    <i class="fas fa-info-circle"></i>
+                                </a><br /></div>
+                            <div class="col-md-2"><label for="page">Page</label>
+                                <a href="#" data-toggle="modal" data-target="#pageModal">
+                                    <i class="fas fa-info-circle"></i>
+                                </a><br /></div>
+                            <div class="col-md-4"><label for="sort">Sort</label>
+                                <a href="#" data-toggle="modal" data-target="#sortModal">
+                                    <i class="fas fa-info-circle"></i>
+                                </a><br /></div>
                             <div class="col-md-4">
                                 <label for="fields">Fields</label>
+                                <a href="#" data-toggle="modal" data-target="#fieldsModal">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
                             </div>
 
                         </div>
@@ -152,7 +238,10 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12"><label for="query">Query</label><br /></div>
+                            <div class="col-md-12"><label for="query">Query</label>
+                                <a href="#" data-toggle="modal" data-target="#queryModal">
+                                    <i class="fas fa-info-circle"></i>
+                                </a><br /></div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12">
@@ -170,24 +259,34 @@
                             <div class="col-md-2">&nbsp;</div>
                         </div>
                         <div class="row">
-                            <div class="form-group col-md-8">
+                            <div class="form-group col-md-10">
 
                                 <select class="custom-select custom-select-sm" id="queryKey">
                                     <?php
                                     foreach ($keys as $key) {
                                         if (($key['permission'] == 'a') || ($key['permission'] == 'r')) {
-                                            echo ("<option value='".$key['keyUUID']."'>".$key['keyName']." [".$key['keyUUID']."]</option>");
+                                            $permissionLabel = '';
+                                            switch ($key['permission']) {
+                                                case 'a':
+                                                    $permissionLabel = '<em>(read/write)</em>';
+                                                    break;
+                                                case 'r':
+                                                    $permissionLabel = '<em>(read)</em>';
+                                                    break;
+                                            }
+                                            echo ("<option value='".$key['keyUUID']."'>".$key['keyName']." [".$key['keyUUID']."] ".$permissionLabel."</option>");
                                         }
                                     }
                                     ?>
                                 </select>
                             </div>
+                            <!--
                             <div class="form-group col-md-2">
-                                <!-- Button trigger modal -->
                                 <button type="button" class="btn btn-primary btn-sm align-baseline" data-toggle="modal" data-target="#helpModal">
                                     <i class="fas fa-info-circle"></i> Help
                                 </button>
                             </div>
+                            -->
                             <div class="col-md-2 align-baseline">
                                 <button type="submit" class="btn btn-primary btn-sm align-baseline"><i class="fas fa-play"></i> Go</button>
                             </div>
@@ -201,6 +300,9 @@
 
 
             <hr />
+            <!-- RESULTS HERE -->
+
+
 
             <div class="card">
                 <div class="card-body">
@@ -212,16 +314,52 @@
                     <div id="errorBox" class="alert alert-warning"Cr role="alert">
                         Error
                     </div>
-                    <div id="results" style="max-height: 600px;" class="overflow-auto">
-                        <!-- JSON results to appear here -->
-                        <pre class="renderjson">{}</pre>
+
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="tabular-tab" data-toggle="tab" href="#tabular" role="tab" aria-controls="tabular" aria-selected="true">Document table</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="json-tab" data-toggle="tab" href="#json" role="tab" aria-controls="json" aria-selected="false">Raw JSON</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+
+                        <div class="tab-pane fade show active" id="tabular" role="tabpanel" aria-labelledby="tabular-tab">
+                            <div id="datatablediv" style="max-height: 600px;" class="overflow-auto">
+                                <!-- JSON results to appear here -->
+                                <table class="table table-striped" id="datatable">
+                                    <thead>
+                                    <tr>
+                                        <!-- <th scope="col">_id</th> -->
+                                        <!-- <th scope="col">Last edited</th> -->
+                                        <th scope="col">Document</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade " id="json" role="tabpanel" aria-labelledby="json-tab">
+                            <div id="results" style="max-height: 600px;" class="overflow-auto">
+                                <!-- JSON results to appear here -->
+                                <pre class="renderjson">{}</pre>
+                            </div>
+                        </div>
+
                     </div>
+
+
                 </div>
             </div>
 
-            <? else: ?>
+            <?php else: ?>
                 <p>Stream not yet activated</p>
-            <? endif; ?>
+            <?php endif; ?>
 
         </div>
 
@@ -230,10 +368,22 @@
 
 <script type="text/javascript" src="/js/renderjson.js"></script>
 <script>
+    var keyPermissions = {};
     $( document ).ready(function() {
         $("#errorBox").hide();
         $("#queryRunning").hide();
+
+        <?php
+        //create key-uuid/permission pairs for checking later whether to display edit/delete buttons
+        foreach ($keys as $key) {
+            echo ('keyPermissions["'.$key['keyUUID'].'"] = "'.$key['permission'].'";'.PHP_EOL);
+        }
+        ?>
+
     });
+
+    var keyUsed = '';
+    var keyUsedPermission = '';
 
     $('#JSONQueryForm').on('submit', function(e) {
         e.preventDefault();
@@ -247,7 +397,9 @@
         var pagesize = $("#pagesize").val();
         var page = $("#page").val();
         var sort = $("#sort").val();
-        var fields = $("#fields").val();
+        var fields = enforceIdField($("#fields").val());
+
+        // FIXME - ensure '_id' field is not omitted from fields. If specifically omitted, add it back in, as it's used for edit/dete refs
 
         var data = {
             'query': query,
@@ -267,6 +419,8 @@
         });
 
         var key = $("#queryKey").val();
+        keyUsed = key;
+        keyUsedPermission = keyPermissions[key];
 
         document.getElementById("results").innerHTML = '';
         var ajaxCall = $.ajax
@@ -292,6 +446,7 @@
             document.getElementById("results").appendChild(
                 renderjson(resultsObj.results)
             );
+            buildResultsTable(resultsObj.results);
         });
 
         ajaxCall.fail(function(response) {
@@ -299,21 +454,6 @@
             var error;
             error = response.responseText;
             console.log(response);
-            /*
-            switch(response.status) {
-                case 400:
-                    error = "Error: Invalid SPARQL query";
-                    break;
-                case 401:
-                    error = "Authentication error: The key provided does not have read access on this dataset. Check that access for this key has not been disabled";
-                    break;
-                case 404:
-                    error = "Graph database not found. This dataset may not yet be enabled for SPARQL queries";
-                    break;
-                default:
-                    error = "An error occurred. The API may be offline or this dataset may not yet be activated";
-            }
-            */
 
             $("#errorBox").html('Query failed: ' + error);
             $("#errorBox").show();
@@ -322,6 +462,41 @@
             //this always runs when ajax complete regardless of the result
         });
 
+        function buildResultsTable (data) {
+            $('#datatable > tbody').empty();
+            for (i = 0; i < data.length; i++) {
+                dateTimeStr = data[i]._timestamp_day + '/' + data[i]._timestamp_month + '/' + data[i]._timestamp_year + ' ' + data[i]._timestamp_hour + ':' + data[i]._timestamp_minute;
+                var docID = data[i]._id;
+                prettyJson = JSON.stringify(data[i],null,'  ');
+                html = '<tr>';
+                //html += '<td><small>' + data[i]._id + '</small></td>';
+                //html += '<td><small>' + dateTimeStr + '</small></td>';
+                html += '<td><small><pre style="max-width: 580px;">' + prettyJson + '</pre></small></td>';
+                html += '<td>';
+                if (keyUsedPermission == 'a') {
+                    html += '<a class="btn btn-sm btn-warning" href="/dataset/json/writedoc/10?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-edit"></i> Edit</a><br />';
+                    html += '<a class="btn btn-sm btn-danger" href="/dataset/json/deletedoc/10?docid='+docID+'&key='+keyUsed+'"><i class="fas fa-trash-alt"></i> Delete</a>';
+                }
+                else {
+                    html += '<button type="button" class="btn btn-sm btn-warning" disabled><i class="fas fa-edit"></i> Edit</button><br />';
+                    html += '<button type="button" class="btn btn-sm btn-danger" disabled><i class="fas fa-trash-alt"></i> Delete</a>';
+                }
+                html += '</td>';
+                $('#datatable > tbody:last-child').append(html);
+            }
+            return true;
+        }
 
+        function enforceIdField (fieldInput) {
+            fieldItems = fieldInput.split(',');
+            newItems = [];
+            for (i = 0; i < fieldItems.length; i++) {
+                if (fieldItems[i] != '-_id') {
+                    newItems.push(fieldItems[i]);
+                }
+            }
+            fieldOutput = newItems.join(',');
+            return fieldOutput;
+        }
     });
 </script>
