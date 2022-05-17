@@ -57,8 +57,8 @@ class JSONBrowserController extends AbstractActionController
         $can_read = $this->_permissionManager->canRead($dataset, $user_id);
         $can_edit = $this->_permissionManager->canEdit($dataset, $user_id);
         $can_write = $this->_permissionManager->canWrite($dataset, $user_id);
-        //$streamExists = $this->_repository->getStreamExists($dataset->uuid);
-        $streamExists = true;
+        $streamExists = $this->_repository->getStreamExists($dataset->uuid);
+        //$streamExists = true;
         $keys = [];
         //$userHasKey = false; //Does the user have a key on this stream (ie do they need to see all the API URLs)?
         $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id, $dataset->id);

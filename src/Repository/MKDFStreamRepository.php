@@ -294,22 +294,29 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $username = $this->_config['mkdf-stream']['user'];
         $password = $this->_config['mkdf-stream']['pass'];
         $server = $this->_config['mkdf-stream']['server-url'];
-        $parameters = array_merge(array('user' => $username,'pwd'=>$password), $parameters);
+        //$parameters = array_merge(array('user' => $username,'pwd'=>$password), $parameters);
         $url = $server . $path;
         $ch = curl_init();
+        $headers = array(
+            'Content-Type:application/json',
+            'Authorization: Basic '. base64_encode($username.":".$password) // <---
+        );
 
         switch ($method){
             case "PUT":
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
                 break;
             case "POST":
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
                 break;
             case "GET":
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($ch, CURLOPT_HTTPGET, 1);
                 $url = $url . '?' . http_build_query($parameters);
                 curl_setopt($ch, CURLOPT_URL, $url);
