@@ -76,27 +76,82 @@ class JSONBrowserController extends AbstractActionController
                 ]
             ];
             $keys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
-            return new ViewModel([
-                'message' => $message,
-                'messages' => $messages,
-                'stream_exists' => $streamExists,
-                'keys' => $keys,
-                'dataset' => $dataset,
-                'stream_url' => $this->_repository->getApiReadHref($dataset->uuid),
-                'read_url' => $this->_repository->getApiReadHref($dataset->uuid),
-                'write_url' => $this->_repository->getApiWriteHref($dataset->uuid),
-                'browse_url' => $this->_repository->getApiBrowseHref($dataset->uuid),
-                'api_home' => $this->_repository->getApiHome(),
-                'features' => $this->datasetsFeatureManager()->getFeatures($id),
-                'actions' => $actions,
-                'can_edit' => $can_edit,
-                'can_read' => $can_read,
-                'can_write' => $can_write,
-                'user_has_key' => $userHasKey,
-                'userDatasetKeys' => $userDatasetKeys,
-                'key' => $keyPassed,
-                'docid' => $docIDPassed,
-            ]);
+
+            //Check if the form has been submitted and we're posting to the API, or we're loading for the first time and providing an interface
+            if($this->getRequest()->isPost()) {
+                $data = $this->params()->fromPost();
+                $writeKey = $data["writekey"];
+                $docBody = $data["docbody"];
+                // insert/update json doc here...
+                if (!is_null($docIDPassed)) {
+                    // UPDATE
+                    $response = $this->_repository->updateDocument ($dataset->uuid,$docBody,$docIDPassed,$writeKey);
+                    if ($response["responseCode"] == "204") {
+                        // All is ok
+                    }
+                    else {
+                        // All is not ok
+                        $this->flashMessenger()->addMessage('Failed to update document - '.$response["responseText"]);
+                        return $this->redirect()->toRoute('json', ['action' => 'details', 'id' => $id]);
+                    }
+                }
+                else {
+                    // CREATE
+                    $response = $this->_repository->pushDocument ($dataset->uuid,$docBody,$writeKey);
+                    if ($response["responseCode"] == "201") {
+                        // All is ok
+                    }
+                    else {
+                        // All is not ok
+                        $this->flashMessenger()->addMessage('Failed to create document - '.$response["responseText"]);
+                        return $this->redirect()->toRoute('json', ['action' => 'details', 'id' => $id]);
+                    }
+                }
+                return new ViewModel([
+                    'data' => $data,
+                    'response' => $response,
+                    'messages' => $messages,
+                    'dataset' => $dataset,
+                    'api_home' => $this->_repository->getApiHome(),
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'actions' => $actions,
+                    'key' => $keyPassed,
+                    'docid' => $docIDPassed,
+                ]);
+            }
+            else {
+                //Check if we're editing an existing doc or loading a blank for  new doc creation...
+                $docToEdit = null;
+                if (!is_null($docIDPassed)) {
+                    $docToEdit = json_encode(json_decode($this->_repository->getDocument($dataset->uuid,$docIDPassed,$keyPassed))[0],JSON_PRETTY_PRINT);
+                }
+
+                return new ViewModel([
+                    'data' => null,
+                    'message' => $message,
+                    'messages' => $messages,
+                    'stream_exists' => $streamExists,
+                    'keys' => $keys,
+                    'dataset' => $dataset,
+                    'stream_url' => $this->_repository->getApiReadHref($dataset->uuid),
+                    'read_url' => $this->_repository->getApiReadHref($dataset->uuid),
+                    'write_url' => $this->_repository->getApiWriteHref($dataset->uuid),
+                    'browse_url' => $this->_repository->getApiBrowseHref($dataset->uuid),
+                    'api_home' => $this->_repository->getApiHome(),
+                    'features' => $this->datasetsFeatureManager()->getFeatures($id),
+                    'actions' => $actions,
+                    'can_edit' => $can_edit,
+                    'can_read' => $can_read,
+                    'can_write' => $can_write,
+                    'user_has_key' => $userHasKey,
+                    'userDatasetKeys' => $userDatasetKeys,
+                    'doctoedit' => $docToEdit,
+                    'key' => $keyPassed,
+                    'docid' => $docIDPassed,
+                ]);
+            }
+
+
         } else {
             $this->flashMessenger()->addMessage('You do not have any suitable keys registered to this dataset for browsing JSON documents. Please use the API tab to register an access key.');
             return $this->redirect()->toRoute('dataset', ['action' => 'details', 'id' => $id]);
@@ -146,8 +201,7 @@ class JSONBrowserController extends AbstractActionController
             $actions = [
                 'label' => 'Actions',
                 'class' => '',
-                'buttons' => [
-                ]
+                'buttons' => [[ 'type' => 'primary', 'label' => 'Create a new JSON Document', 'icon' => 'create', 'target' => 'json', 'params' => ['id' => $dataset->id, 'action' => 'writedoc']]]
             ];
             $keys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
             return new ViewModel([

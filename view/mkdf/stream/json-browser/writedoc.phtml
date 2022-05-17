@@ -1,3 +1,106 @@
-WRITE DOC
-<?= $docid ?> <br />
-<?= $key ?>
+<?php if(!is_null($data)): ?>
+
+    <h1>JSON document
+        <?php if(!is_null($docid)): ?>
+            updated
+        <?php else: ?>
+            created
+        <?php endif; ?>
+    </h1>
+    <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+    <!-- Token: <?= $token ?> -->
+        <?php if(is_null($docid)): ?>
+            <h3>Document summary:</h3>
+            <p>
+                <pre><?= $response["responseText"] ?></pre>
+            </p>
+        <?php endif; ?>
+
+    <?= $this->partial('mkdf/core/partial/actions', [
+        'buttons'=>[
+            ['type'=>'warning','label'=>'Create a new JSON document', 'target'=> 'json', 'params'=> ['id' => $dataset->id, 'action' => 'writedoc']],
+            ['type'=>'primary','label'=>'Return to JSON tools', 'target'=> 'json', 'params'=> ['id' => $dataset->id, 'action' => 'details']]]
+    ]); ?>
+
+<?php else: ?>
+
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
+            <?php if(!is_null($docid)): ?>
+                <h2>JSON - Update document</h2>
+            <?php else: ?>
+                <h2>JSON - Create new document</h2>
+            <?php endif; ?>
+
+            <!--
+            UUID: <?= $dataset->uuid ?><br />
+            -->
+
+            <?php if(!is_null($docid)): ?>
+                <form name="form1" id="form1" method="post" action="<?= $this->url( 'json', ['id' => $dataset->id, 'action' => 'writedoc'], [ 'query' => ['docid' => $docid] ] ); ?>">
+            <?php else: ?>
+                <form name="form1" id="form1" method="post" action="<?= $this->url( 'json', ['id' => $dataset->id, 'action' => 'writedoc'], [ 'query' => [] ] ); ?>">
+            <?php endif; ?>
+                <div class="form-group">
+                    <label for="writeKey">Select a key to use for writing this document</label><br />
+                    <select class="custom-select custom-select-sm" id="writeKey" name="writeKey">
+                        <?php
+                        foreach ($keys as $singleKey) {
+                            if (($singleKey['permission'] == 'a') || ($singleKey['permission'] == 'w')) {
+                                $permissionLabel = '';
+                                switch ($singleKey['permission']) {
+                                    case 'a':
+                                        $permissionLabel = '<em>(read/write)</em>';
+                                        break;
+                                    case 'w':
+                                        $permissionLabel = '<em>(write)</em>';
+                                        break;
+                                }
+                                echo ("<option value='".$singleKey['keyUUID']."'>".$singleKey['keyName']." [".$singleKey['keyUUID']."] ".$permissionLabel."</option>");
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="docbody">JSON Document</label>
+                    <?php
+                        if (!is_null($docid)) {
+                            echo(" <em>[".json_decode($doctoedit)->_id."]</em>");
+                        }
+                    ?>
+                    <textarea class="form-control" id="docbody" name="docbody" rows="15"><?php if(!is_null($docid)): ?><?= $doctoedit ?><?php endif; ?>
+                    </textarea>
+                </div>
+                <div class="form-group">
+                    <?php if(!is_null($docid)): ?>
+                        <input class="btn btn-primary" type="submit" value="Update">
+                    <?php else: ?>
+                        <input class="btn btn-primary" type="submit" value="Create">
+                    <?php endif; ?>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+    <script>
+        <?php if(!is_null($key)): ?>
+        var key = "<?= $key ?>";
+        $( document ).ready(function() {
+            $("#writeKey").val(key).change();
+        });
+        <?php endif; ?>
+    </script>
+
+<?php endif; ?>

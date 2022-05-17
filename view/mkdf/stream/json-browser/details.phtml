@@ -6,9 +6,10 @@
         </div>
         <div class="col-md-9">
             <?= $this->partial('mkdf/core/partial/messages', ['messages' => $messages] ) ?>
-            <h2>JSON - Browse</h2>
+            <h2>JSON Tools</h2>
 
             <?php if ($stream_exists): ?>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
 
             <div class="card">
                 <div class="card-body">
