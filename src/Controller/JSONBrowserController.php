@@ -88,6 +88,8 @@ class JSONBrowserController extends AbstractActionController
                     $response = $this->_repository->updateDocument ($dataset->uuid,$docBody,$docIDPassed,$writeKey);
                     if ($response["responseCode"] == "204") {
                         // All is ok
+                        $this->flashMessenger()->addMessage('JSON document successfully updated.');
+                        return $this->redirect()->toRoute('json', ['action' => 'details', 'id' => $id]);
                     }
                     else {
                         // All is not ok
