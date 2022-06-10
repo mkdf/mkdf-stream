@@ -101,12 +101,17 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 $write = 0;
         }
         $path = '/management/permissions/'.$key;
+
         $this->sendQuery("POST",$path, array('dataset-id'=>$uuid, 'read'=>$read, 'write'=>$write));
     }
 
-    public function getDocument ($dataset,$docId,$key) {
-        $username = $key;
-        $password = $key;
+    public function getDocument ($dataset,$docId,$key=null) {
+        $username = $this->_config['mkdf-stream']['user'];
+        $password = $this->_config['mkdf-stream']['pass'];
+        if(!is_null($key)){
+            $username = $key;
+            $password = $key;
+        }
         $server = $this->_config['mkdf-stream']['server-url'];
         $path = '/object/'.$dataset.'/'.$docId;
         $url = $server . $path;
@@ -283,6 +288,86 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         return $returnObj;
     }
 
+    public function createAccessRequest ($datasetId, $user, $accessLevel, $description) {
+        $arDataset = $this->_config['mkdf-stream']['access-requests'];
+
+        $document = [
+            'datasetId' => $datasetId,
+            'user' => $user,
+            'accessLevel' => $accessLevel,
+            'request' => $description,
+            'status' => 'pending'
+        ];
+
+        $returnObj = $this->pushDocument ($arDataset,json_encode($document));
+        return $returnObj;
+    }
+
+    public function approveAccessRequest ($arId, $description) {
+        $arDataset = $this->_config['mkdf-stream']['access-requests'];
+        $accessRequest = json_decode($this->getDocument($arDataset,$arId),true)[0];
+        $accessRequest['response'] = $description;
+        $accessRequest['status'] = 'accepted';
+        print_r($accessRequest);
+
+        $response = $this->updateDocument($arDataset, json_encode($accessRequest), $arId);
+        return $response;
+    }
+
+    public function rejectAccessRequest ($arId, $description) {
+        $arDataset = $this->_config['mkdf-stream']['access-requests'];
+        $accessRequest = json_decode($this->getDocument($arDataset,$arId),true)[0];
+        $accessRequest['response'] = $description;
+        $accessRequest['status'] = 'rejected';
+        print_r($accessRequest);
+
+        $response = $this->updateDocument($arDataset, json_encode($accessRequest), $arId);
+        return $response;
+    }
+
+    public function getAccessRequests ($datasetId, $user = null) {
+        $username = $this->_config['mkdf-stream']['user'];
+        $password = $this->_config['mkdf-stream']['pass'];
+        $arDataset = $this->_config['mkdf-stream']['access-requests'];
+        $server = $this->_config['mkdf-stream']['server-url'];
+        $path = '/object/'.$arDataset;
+        $url = $server . $path;
+
+        $query = [
+            'datasetId' => $datasetId
+        ];
+        if (!is_null($user)) {
+            $query['user'] = $user;
+        }
+        $query = json_encode($query);
+
+        $parameters = array('query' => $query);
+
+        $url = $url . '?' . http_build_query($parameters);
+        $curl = curl_init();
+
+        $headers = array(
+            'Content-Type:application/json',
+            'Authorization: Basic '. base64_encode($username.":".$password) // <---
+        );
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => $headers,
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
+    }
+
     /**
      * @param $method
      * @param $path
@@ -298,26 +383,29 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $url = $server . $path;
         $ch = curl_init();
         $headers = array(
-            'Content-Type:application/json',
+            //'Content-Type:application/json',
             'Authorization: Basic '. base64_encode($username.":".$password) // <---
         );
 
         switch ($method){
             case "PUT":
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
                 break;
             case "POST":
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 break;
             case "GET":
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_HTTPGET, 1);
+                curl_setopt($ch, CURLOPT_HTTPGET, true);
                 $url = $url . '?' . http_build_query($parameters);
                 curl_setopt($ch, CURLOPT_URL, $url);
                 break;
@@ -326,8 +414,6 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
                 throw new \Exception("Unexpected method");
         }
         // receive server response ...
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         $server_output = curl_exec ($ch);
 
         if (!curl_errno($ch)) {
