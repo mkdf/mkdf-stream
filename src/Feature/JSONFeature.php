@@ -50,7 +50,7 @@ class JSONFeature implements DatasetsFeatureInterface
     }
 
     public function getLabel(){
-        return '<i class="fas fa-file-code"></i> JSON';
+        return '<i class="fas fa-file-code"></i> JSON tools';
     }
 
     public function isActive(){
