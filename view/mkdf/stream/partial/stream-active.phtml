@@ -33,8 +33,10 @@
 
             if ($user_has_key) {
                 print('<h5>Your keys on this dataset</h5>');
+                print('<small class="form-text text-muted">Full license descriptions are available under the <em>Licenses and policies</em> tab. </small>');
+
                 print ('<table class="table table-bordered">');
-                print ('<tr><th>UUID / Description</th> <th>Permission</th> <th>Actions</th></tr>');
+                print ('<tr><th>UUID / Description</th> <th>Permission</th> <th>License</th> <th>Actions</th></tr>');
                 foreach ($userDatasetKeys as $key) {
                     $permissionLabel = '';
                     switch ($key['permission']) {
@@ -63,15 +65,32 @@
                         print ('<tr>');
                     }
                     print ('<td><em>'.$key['keyUUID'].'</em><br />'.$key['keyName'].'</td> <td><em>'.$permissionLabel.'</em></td>');
-                    print ('<td>');
+                    if ($key['license'] == '' || is_null($key['license'])){
+                        print ('<td class="bg-warning opacity-50">None assigned</td>');
+
+                    }
+                    else {
+                        print ('<td data-toggle="tooltip" data-placement="top" title="'.$key['license'].'">'.substr($key['license'],0,12).'...</td>');
+
+                    }
+                    print ('<td class="text-center">');
                     $deleteAction = [
                         'class'=>'btn-group-sm',
                         'buttons'=>[
                             ['type'=>'primary','label'=>'Remove', 'icon' => 'delete', 'target'=> 'stream', 'params'=> ['id' => $dataset->id, 'action' => 'removekey'], 'query' => ['key' => $key['keyUUID']]],
                         ]
                     ];
+                    $editAction = [
+                        'class'=>'btn-group-sm',
+                        'buttons'=>[
+                            ['type'=>'primary','label'=>'Edit', 'icon' => 'edit', 'target'=> 'stream', 'params'=> ['id' => $dataset->id, 'action' => 'editkey'], 'query' => ['key' => $key['keyUUID']]],
+                        ]
+                    ];
                     if ($permissionLabel != 'disabled') {
                         print($this->partial('mkdf/core/partial/actions', $deleteAction));
+                        print("<br />");
+                        print($this->partial('mkdf/core/partial/actions', $editAction));
+
                     }
 
                     print ('</td></tr>');

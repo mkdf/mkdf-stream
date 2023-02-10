@@ -115,7 +115,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $server = $this->_config['mkdf-stream']['server-url'];
         $path = '/object/'.$dataset.'/'.$docId;
         $url = $server . $path;
-
+        //print($url);
         $curl = curl_init();
 
         $headers = array(
@@ -150,6 +150,46 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         $url = $server . $path;
 
         $parameters = array('query' => $query);
+
+        $url = $url . '?' . http_build_query($parameters);
+        $curl = curl_init();
+
+        $headers = array(
+            'Content-Type:application/json',
+            'Authorization: Basic '. base64_encode($username.":".$password) // <---
+        );
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => $headers,
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
+    }
+
+    public function browseDocuments ($dataset,$query = '{}', $fields = null) {
+        $username = $this->_config['mkdf-stream']['user'];
+        $password = $this->_config['mkdf-stream']['pass'];
+        //$username = $key;
+        //$password = $key;
+        $server = $this->_config['mkdf-stream']['server-url'];
+        $path = '/browse/'.$dataset;
+        $url = $server . $path;
+
+        $parameters = array('query' => $query);
+
+        if ($fields) {
+            $parameters['fields'] = $fields;
+        }
 
         $url = $url . '?' . http_build_query($parameters);
         $curl = curl_init();

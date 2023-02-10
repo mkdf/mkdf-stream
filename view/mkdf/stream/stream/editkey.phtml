@@ -1,0 +1,57 @@
+<h1><?= $dataset->title ?></h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <?= $this->partial('mkdf/datasets/partial/dataset-features', ['features' => $features, 'dataset_id' => $dataset->id] ) ?>
+        </div>
+        <div class="col-md-9">
+            <h2>Edit key settings</h2>
+            <?= $this->partial('mkdf/core/partial/actions', $actions); ?>
+
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- <h5 class="card-title">Edit key</h5> -->
+
+                    <p class="card-text">Change the settings for the key access to this dataset here.</p>
+
+
+                    <form action="<?= $this->url( 'stream', ['id'=>$dataset->id, 'action'=>'editkey'],[]); ?>" method="post" id="edit-form" name="edit-form">
+                        <div class="form-group">
+
+
+                            <label for="access-level">Select access level:</label>
+                            <select class="form-control" id="access-level" name="access-level" disabled>
+                                <option value="disabled">Option currently disabled</option>
+                            </select>
+                            <br />
+
+                            <label for="license">Select a license to be used with this dataset:</label>
+                            <select class="form-control" id="license" name="license">
+                                <?php foreach ($licenses as $license): ?>
+                                    <?php
+                                        $active = "";
+                                        if ($license['odrl:uid'] == $activeLicense) {
+                                            $active = "selected";
+                                        }
+                                    ?>
+                                    <option value="<?= $license['odrl:uid'] ?>" <?= $active ?>><?= $license['schema:title'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="hidden" id="oldLicense" name="oldLicense" value="<?= $activeLicense ?>">
+                            <input type="hidden" id="key" name="key" value="<?= $key ?>">
+                            <small id="licenesHelp" class="form-text text-muted">Full license descriptions are available under the <em>Licenses and policies</em> tab. </small>
+                            <br />
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+

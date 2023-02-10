@@ -62,6 +62,15 @@
                                 </select>
                                 <br />
 
+                                <label for="license">Select a license to be used with this dataset:</label>
+                                <select class="form-control" id="license" name="license">
+                                    <?php foreach ($licenses as $license): ?>
+                                        <option value="<?= $license['odrl:uid'] ?>"><?= $license['schema:title'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small id="licenesHelp" class="form-text text-muted">Full license descriptions are available under the <em>Licenses and policies</em> tab. </small>
+                                <br />
+
                                 <?php if($availableKeys): ?>
                                     <button type="submit" class="btn btn-primary">Register</button>
                                 <?php else: ?>
