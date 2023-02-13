@@ -140,11 +140,13 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
         return $response;
     }
 
-    public function getDocuments ($dataset,$numDocs,$key,$query = '{}') {
-        //$username = $this->_config['mkdf-stream']['user'];
-        //$password = $this->_config['mkdf-stream']['pass'];
-        $username = $key;
-        $password = $key;
+    public function getDocuments ($dataset,$numDocs,$key = null ,$query = '{}') {
+        $username = $this->_config['mkdf-stream']['user'];
+        $password = $this->_config['mkdf-stream']['pass'];
+        if(!is_null($key)){
+            $username = $key;
+            $password = $key;
+        }
         $server = $this->_config['mkdf-stream']['server-url'];
         $path = '/object/'.$dataset;
         $url = $server . $path;
@@ -171,6 +173,7 @@ class MKDFStreamRepository implements MKDFStreamRepositoryInterface
             CURLOPT_HTTPHEADER => $headers,
         ));
 
+        //print($url);
         $response = curl_exec($curl);
         curl_close($curl);
         return $response;
