@@ -63,11 +63,13 @@ class StreamController extends AbstractActionController
         $userHasKey = $this->_keys_repository->userHasDatasetKey($user_id,$dataset->id);
         $userDatasetKeys = $this->_keys_repository->userDatasetKeys($user_id,$dataset->id);
         $userDatasetKeyLicenses = $this->_policies_repository->getUserLicenseKeyAssocs($dataset->uuid, $user_email);
+        $licenseTitles = $this->_policies_repository->getLocalLicenseTitles($dataset->uuid);
         foreach ($userDatasetKeys as $index=>$keyItem) {
             $userDatasetKeys[$index]['license'] = null;
             foreach ($userDatasetKeyLicenses as $licenseAssoc) {
                 if ($keyItem['keyUUID'] == $licenseAssoc['key']){
                     $userDatasetKeys[$index]['license'] = $licenseAssoc['license'];
+                    $userDatasetKeys[$index]['licenseTitle'] = $licenseTitles[$licenseAssoc['license']];
                 }
             }
         }
