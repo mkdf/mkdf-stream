@@ -287,7 +287,8 @@ class StreamController extends AbstractActionController
             $oldLicense = $data['oldLicense'];
             $keyPassed = $data['key'];
             if ($data['license']) {
-                // FIXME - CONTINUE HERE...
+                /*
+                 * // this fails if there isn't an existing association (since the next line returns False)
                 if ($this->_policies_repository->removeLicenseKeyAssoc ($dataset->uuid, $keyPassed)) {
                     $this->_policies_repository->assignLicenseToKeyAccess($dataset->uuid, $keyPassed, $user_email, $license);
                     $this->flashMessenger()->addMessage('Updated key license');
@@ -295,6 +296,10 @@ class StreamController extends AbstractActionController
                 else {
                     $this->flashMessenger()->addMessage('Error editing key license');
                 }
+                */
+                $this->_policies_repository->removeLicenseKeyAssoc ($dataset->uuid, $keyPassed);
+                $this->_policies_repository->assignLicenseToKeyAccess($dataset->uuid, $keyPassed, $user_email, $license);
+                $this->flashMessenger()->addMessage('Updated key license');
             }
             else {
                 $this->flashMessenger()->addMessage('Error: license details not supplied.');
